@@ -1,0 +1,13 @@
+Requirements:
+* https://github.com/peers/peerjs
+* https://github.com/peers/peerjs-server
+
+References
+* http://peerjs.com/docs/
+
+Server:
+* sudo npm install peer -g
+* peerjs --port 9000 --key peerjs
+
+Client
+* just launch the client in var/www/index.html

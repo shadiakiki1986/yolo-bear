@@ -1,0 +1,10 @@
+I'm tring to follow Semantic Versioning 2.0.0
+http://semver.org/
+
+=V1.1.2=
+* 2015-02-09: adding forgot password button
+
+=V1.0=
+==2015-01-30 09:55:28==
+* moving client out of zboota-server into separate repo and building app
+* I'm starting off with 1.0 since I had already progressed with the app in zboota-server repo
