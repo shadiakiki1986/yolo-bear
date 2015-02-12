@@ -9,6 +9,7 @@
         <script src="js/vendor/angular-1.2.28.min.js"></script>
         <script src="js/vendor/peer-0.3.0.min.js"></script>
         <script src="js/vendor/moment-2.9.0.min.js"></script>
+        <script src="js/common.js"></script>
         <script src="js/YoloBearPeer.js"></script>
 
 <script>
@@ -24,20 +25,18 @@
 <body> 
 
 <div ng-controller="YoloBearPeer">
-<button ng-click="listPeers()">doit</button>
   Your PeerJS id is : {{id}}<br><br>
+  Admin is {{whoIsAdmin()}}, {{whoIsAdmin2()}}<br><br>
   Connect to peer: <input type="text" ng-model="rid" placeholder="Someone else's id">
                    <button ng-click="connectOut(rid); rid=''; ">Connect</button>
   <br><br>
-  
   
   <div id="chat_area" ng-show="peers().length>0">
     <input type="text" ng-model="msg" placeholder="Enter message">
     <ul>
     <li ng-repeat="p in peers()">
 	{{p}} &nbsp; {{peerList(p)}} &nbsp;
-	<button ng-click="send(p);" ng-show="p!=id">Send</button>
-	<span ng-show="p==id">(me)</span>
+	<button ng-click="send(p);" ng-show="p!=id" ng-disabled="!alive[p]">Send</button>
 	<ul>
 	<li ng-repeat="pm in peerMsgs(p)">{{pm.ts}}: {{pm.msg}}</li>
 	</ul>
