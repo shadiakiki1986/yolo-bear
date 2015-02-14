@@ -1,48 +1,22 @@
 <!DOCTYPE HTML> 
-<html lang="en"> 
+<html lang="en" ng-app> 
 <head>
-<title>PeerJS chat demo</title>
+<title>yolo-bear</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
 <meta http-equiv="Content-Language" content="en-us"> 
 
         <script src="js/vendor/jquery-2.1.1.min.js"></script>
-<!--        <script src="js/vendor/angular-1.2.28.min.js"></script>-->
+        <script src="js/vendor/angular-1.2.28.min.js"></script>
         <script src="js/vendor/peer-0.3.0.min.js"></script>
+        <script src="js/vendor/moment-2.9.0.min.js"></script>
+        <script src="js/common.js"></script>
+        <script src="js/YoloBearPeer.js"></script>
+        <script src="js/YoloBearTournament.js"></script>
+        <script src="js/Controller1.js"></script>
+
 <script>
   
-  var conn;
-  // Connect to PeerJS, have server assign an ID instead of providing one
-  var peer = new Peer({key: 'peerjs', host: 'localhost', port: 9000, path: '/', debug: true});
-  peer.on('open', function(id){
-    $('#pid').text(id);
-  });  
-  // Await connections from others
-  peer.on('connection', connect);
-  function connect(c) {
-    $('#chat_area').show();
-    conn = c;
-    $('#messages').empty().append('Now chatting with ' + conn.peer);
-    conn.on('data', function(data){
-      $('#messages').append('<br>' + conn.peer + ':<br>' + data);
-    });
-    conn.on('close', function(err){ alert(conn.peer + ' has left the chat.') });
-  }
   $(document).ready(function() {
-    // Conect to a peer
-    $('#connect').click(function(){
-      var c = peer.connect($('#rid').val());
-      c.on('open', function(){
-        connect(c);
-      });
-      c.on('error', function(err){ alert(err) });  
-    });
-    // Send a chat message
-    $('#send').click(function(){
-      var msg = $('#text').val();
-      conn.send(msg);
-      $('#messages').append('<br>You:<br>' + msg);
-      $('#text').val('');
-    });
     // Show browser version
     $('#browsers').text(navigator.userAgent);
   });
@@ -52,22 +26,73 @@
  
 <body> 
 
-Run on server: sudo npm install peer -g && peerjs --port 9000 --key peerjs
-<br>
+<div ng-controller="YoloBearPeer">
+  Your PeerJS id is : {{id}}<br><br>
+  Admin is {{whoIsAdmin()}}, {{whoIsAdmin2()}}<br><br>
+  Connect to peer: <input type="text" ng-model="rid" placeholder="Someone else's id">
+                   <button ng-click="connectOut(rid); rid=''; ">Connect</button>
+  <br><br>
+  
+  <div id="chat_area" ng-show="peers().length>0">
+    <input type="text" ng-model="msg" placeholder="Enter message">
+    <ul>
+    <li ng-repeat="p in peers()">
+	{{p}} &nbsp; {{peerList(p)}} &nbsp;
+	<button ng-click="send(p);" ng-show="p!=id" ng-disabled="!alive[p]">Send</button>
+	<ul>
+	<li ng-repeat="pm in peerMsgs(p)">{{pm.ts}}: {{pm.msg}}</li>
+	</ul>
+    </li>
+    <li>
+	{{id}} &nbsp; (me)
+	<ul>
+	<li ng-repeat="pm in peerMsgs(id)">{{pm.ts}}: {{pm.msg}}</li>
+	</ul>
+    </li>
 
-  Your PeerJS id is : <span id="pid"></span><br><br>
-  Connect to peer: <input type="text" id="rid" placeholder="Someone else's id">
-                   <input type="button" value="Connect" id="connect"><br><br>
-  
-  
-  <div id="chat_area" style="display: none;">
-    <div id="messages"></div>
-    <input type="text" id="text" placeholder="Enter message">
-    <input type="button" value="Send" id="send">
+    </ul>
   </div>
   
+<br/>
 
-  
+<div ng-controller="Controller1">
+Teams<br>
+<ul><li ng-repeat="te in ybt.teams">{{te.name}}: {{teamPlayers(te.id)}} </li></ul>
+New team<br>
+<input type='text' ng-model="newTeam.name" placeholder="Name" required><br>
+<button ng-click="addTeam()">Add</button>
+<br>
+
+Players<br>
+<ul><li ng-repeat="pl in ybt.players">{{pl.name}} - {{pl.team}}</li></ul>
+New player<br>
+<input type='text' ng-model="newPlayer.name" placeholder="Name" required><br>
+<select size=5 ng-model="newPlayer.team" ng-options="te.id as te.name for te in ybt.teams"></select><br>
+
+<button ng-click="addPlayer()">Add</button>
+<br>
+
+Games<br>
+<ul><li ng-repeat="ga in ybt.games">
+{{ga.team1}} ({{ga.team1Score}} &nbsp;
+<button ng-click="setGameScore(ga.id,ga.team1Score+1,ga.team2Score)">+</button>
+<button ng-click="setGameScore(ga.id,ga.team1Score-1,ga.team2Score)">-</button>)
+x
+{{ga.team2}} ({{ga.team2Score}} &nbsp;
+<button ng-click="setGameScore(ga.id,ga.team1Score,ga.team2Score+1)">+</button>
+<button ng-click="setGameScore(ga.id,ga.team1Score,ga.team2Score-1)">-</button>)
+</li></ul>
+New game<br>
+<select size=5 ng-model="newGame.team1" ng-options="te.id as te.name for te in ybt.teams"></select>
+<select size=5 ng-model="newGame.team2" ng-options="te.id as te.name for te in ybt.teams"></select><br>
+
+<button ng-click="addGame()">Add</button>
+<br>
+
+
+</div>
+
+</div><!-- end YoloBearPeer-->
   
   <br><br><br>
   <p style="font-size: 10px;">Your browser version: <span id="browsers"></span><br>

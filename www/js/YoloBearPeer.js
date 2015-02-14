@@ -51,6 +51,7 @@ function YoloBearPeer($scope) {
                         if(wia2!=$scope.id && !$scope.conns.hasOwnProperty(wia2)) { console.log("Need to connect to ",wia2); $scope.connectOut(wia2); }
                     }
                     break;
+                case "tournament": $scope.$broadcast('responseDataBroadcast',data.ybt); break;
 		default: alert("undefined data type");
 		}
 	} else {
@@ -111,5 +112,15 @@ function YoloBearPeer($scope) {
   $scope.peerList=function(id) { if($scope.peers()<=1) return ""; else return "("+$scope.lists[id].filter(function(x) { return $scope.peers().indexOf(x)==-1 && x!=$scope.id; }).join()+")"; };
   $scope.whoIsAdmin= id => Object.keys($scope.admins).filter(x => $scope.admins[x]==Object.values($scope.admins).min())[0];
   $scope.whoIsAdmin2= id => (Object.keys($scope.admins).length<=1?"":Object.keys($scope.admins).filter(x => $scope.admins[x]==Object.values($scope.admins).diff(Object.values($scope.admins).min()).min())[0]);
+
+  $scope.$on('requestDataBroadcast',function(event,ybt) {
+    if($scope.id==$scope.whoIsAdmin()||$scope.id==$scope.whoIsAdmin2()) {
+      $scope.peers().map(function(x) { if($scope.alive[x]) {
+        $scope.conns[x].send({type:"tournament",ybt:ybt});
+      } });
+    }
+  });
+
+
 
 }

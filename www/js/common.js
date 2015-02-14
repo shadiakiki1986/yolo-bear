@@ -3,3 +3,4 @@ Array.prototype.min = function() { return Math.min.apply(null, this); };
 Array.prototype.diff = function(a) {
     return this.filter(function(i) {return i!=a;});
 };
+
