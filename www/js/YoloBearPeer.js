@@ -22,7 +22,7 @@ function YoloBearPeer($scope) {
     $scope.peer.on('connection', function(c) {
         $scope.$apply(function() {
             $scope.admins[c.peer]=moment().valueOf(); // prioritize by time of connection
-            broadcastListResponse();
+            $scope.broadcastListResponse();
             $scope.connect(c);
         });
     });
@@ -32,14 +32,14 @@ function YoloBearPeer($scope) {
     $scope.msgs[c.peer]=[];
     $scope.lists[c.peer]=[];
     c.on('data', function(data){ $scope.$apply(function() {
-console.log(data);
 	if(data.type) {
                 wia=$scope.whoIsAdmin();
                 wia2=$scope.whoIsAdmin2();
-		if(!($scope.id==wia&&wia2=="")&&!(c.peer==wia||c.peer==wia2)) return; // only listen to admins
+
 		switch(data.type) {
                 case "listRequest": sendListResponse(c.peer); break;
 		case "listResponse":
+                    if(!($scope.id==wia&&wia2=="")&&!(c.peer==wia||c.peer==wia2)) return; // only listen to admins
                     $scope.lists[c.peer]=Object.keys(data.admins);
                     $scope.admins=data.admins;
                     // update who I think the admins are
@@ -68,7 +68,7 @@ console.log(data);
   connectOutId={};
   $scope.connectOut=function(id) {
     if(connectOutId.hasOwnProperty(id)) return; // already pending request to connect
-    connectOutId[id]=setTimeout(function() { updatePeerStatus(id); delete connectOutId[id]; }, 5000); // must connect within 5 seconds
+    connectOutId[id]=setTimeout(function() { updatePeerStatus(id); delete connectOutId[id]; console.log("connect out timeout"); }, 5000); // must connect within 5 seconds
     c=$scope.peer.connect(id);
     c.on('open', function() { $scope.$apply(function() {
         if(connectOutId.hasOwnProperty(id)) { clearTimeout(connectOutId[id]); delete connectOutId[id]; }
@@ -82,7 +82,7 @@ console.log(data);
   updatePeerStatus=function(id) {
     $scope.alive[id]=false;
     delete $scope.admins[id];
-    broadcastListResponse(); // only admins broadcast since only admins are listened to
+    $scope.broadcastListResponse(); // only admins broadcast since only admins are listened to
   };
 
   $scope.send=function(id) {
@@ -94,7 +94,7 @@ console.log(data);
   sendListResponse=function(id) {
     $scope.conns[id].send({type:"listResponse",admins:$scope.admins});
   };
-  broadcastListResponse = function() {
+  $scope.broadcastListResponse = function() {
     if($scope.id==$scope.whoIsAdmin()||$scope.id==$scope.whoIsAdmin2()) {
       $scope.peers().map(function(x) { if($scope.alive[x]) sendListResponse(x); });
     }
