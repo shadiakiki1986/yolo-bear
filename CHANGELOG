@@ -2,6 +2,13 @@ I'm tring to follow Semantic Versioning 2.0.0
 http://semver.org/
 
 =V0.0.0=
+2015-02-16
+* added score editing at level of players
+* added team total games won, lost, tied
+* added more game stats than score
+* moved YoloBearPeer as controller within Controller1
+** instead of opposite
+
 2015-02-14
 * peers can connect to each other
 * first 2 peers made admins

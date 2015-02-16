@@ -51,7 +51,10 @@ function YoloBearPeer($scope) {
                         if(wia2!=$scope.id && !$scope.conns.hasOwnProperty(wia2)) { console.log("Need to connect to ",wia2); $scope.connectOut(wia2); }
                     }
                     break;
-                case "tournament": $scope.$broadcast('responseDataBroadcast',data.ybt); break;
+                case "tournament":
+                    if($scope.id!=wia) return; // only listen to first admin
+                    $scope.$emit('responseDataBroadcast',data.ybt);
+                    break;
 		default: alert("undefined data type");
 		}
 	} else {
