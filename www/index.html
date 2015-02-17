@@ -4,6 +4,7 @@
 <title>yolo-bear</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
 <meta http-equiv="Content-Language" content="en-us"> 
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
         <script src="js/vendor/jquery-2.1.1.min.js"></script>
         <script src="js/vendor/angular-1.2.28.min.js"></script>
@@ -13,20 +14,60 @@
         <script src="js/YoloBearPeer.js"></script>
         <script src="js/YoloBearTournament.js"></script>
         <script src="js/Controller1.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap-3.3.2.min.css">
+        <script src="js/vendor/bootstrap-3.3.2.min.js"></script>
+        <script src="js/index.js"></script>
 
-<script>
-  
-  $(document).ready(function() {
-    // Show browser version
-    $('#browsers').text(navigator.userAgent);
-  });
-
-</script>
 </head> 
  
-<body> 
+<body class="container"> 
 
-<div ng-controller="Controller1">
+<div class="row">
+    <div class="muted pull-left"><img src="img/logo.jpeg" alt="logo"> &nbsp; Yolo bear</div>
+</div>
+<div class="jumbotron" id="decideFollowCreate">
+<!--   <h3>With Yolo Bear you can create a tournament, manage it, and broadcast it to other people's devices, or you can sit back and watch a broadcast of an existing tournament.</h3>-->
+   <div class="row">
+   <a class="col-xs-4 col-xs-offset-1 btn btn-lg btn-primary" id="decideFollowBtn">Follow a tournament</a>
+   <a class="col-xs-4 col-xs-offset-1 btn btn-lg btn-info">Broadcast a tournament</a>
+   &nbsp;
+   </div>
+</div>
+<div ng-controller="Controller1" id="Controller1">
+    <div ng-controller="YoloBearPeer">
+      <div class="pull-right pull-top">Your PeerJS id is : {{id}}</div>
+      <div id="ybpConnectDiv" hidden>
+      Admin is {{whoIsAdmin()}}, {{whoIsAdmin2()}}<br><br>
+      Connect to peer: <input type="text" ng-model="rid" placeholder="Someone else's id">
+                       <button ng-click="connectOut(rid); rid=''; ">Connect</button>
+                       <button id="ybpConnectCancelBtn">Cancel</button>
+      </div>
+      <br><br>
+      
+      <div id="chat_area" ng-show="peers().length>0">
+        <input type="text" ng-model="msg" placeholder="Enter message">
+        <ul>
+        <li ng-repeat="p in peers()">
+    	{{p}} &nbsp; {{peerList(p)}} &nbsp;
+    	<button ng-click="send(p);" ng-show="p!=id" ng-disabled="!alive[p]">Send</button>
+    	<ul>
+    	<li ng-repeat="pm in peerMsgs(p)">{{pm.ts}}: {{pm.msg}}</li>
+    	</ul>
+        </li>
+        <li>
+    	{{id}} &nbsp; (me)
+    	<ul>
+    	<li ng-repeat="pm in peerMsgs(id)">{{pm.ts}}: {{pm.msg}}</li>
+    	</ul>
+        </li>
+    
+        </ul>
+      </div>
+      
+    <br/>
+    </div><!-- end YoloBearPeer-->
+
     Teams<br>
     <ul>
     <li ng-repeat="te in ybt.teams">
@@ -84,35 +125,6 @@
     <br>
     
     
-    <div ng-controller="YoloBearPeer">
-      Your PeerJS id is : {{id}}<br><br>
-      Admin is {{whoIsAdmin()}}, {{whoIsAdmin2()}}<br><br>
-      Connect to peer: <input type="text" ng-model="rid" placeholder="Someone else's id">
-                       <button ng-click="connectOut(rid); rid=''; ">Connect</button>
-      <br><br>
-      
-      <div id="chat_area" ng-show="peers().length>0">
-        <input type="text" ng-model="msg" placeholder="Enter message">
-        <ul>
-        <li ng-repeat="p in peers()">
-    	{{p}} &nbsp; {{peerList(p)}} &nbsp;
-    	<button ng-click="send(p);" ng-show="p!=id" ng-disabled="!alive[p]">Send</button>
-    	<ul>
-    	<li ng-repeat="pm in peerMsgs(p)">{{pm.ts}}: {{pm.msg}}</li>
-    	</ul>
-        </li>
-        <li>
-    	{{id}} &nbsp; (me)
-    	<ul>
-    	<li ng-repeat="pm in peerMsgs(id)">{{pm.ts}}: {{pm.msg}}</li>
-    	</ul>
-        </li>
-    
-        </ul>
-      </div>
-      
-    <br/>
-    </div><!-- end YoloBearPeer-->
     
 </div>
 
