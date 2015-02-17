@@ -47,4 +47,9 @@ $scope.setGamePlayerScore=function(ga,gpsid,sn,sv) {
   requestDataBroadcast();
 };
 
+    $scope.iAmAdminV = false;
+    $scope.iAmAdmin = function(){
+        $scope.$broadcast('amIAdmin');
+        return  $scope.iAmAdminV;
+    }
 }

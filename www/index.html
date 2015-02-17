@@ -14,7 +14,6 @@
         <script src="js/YoloBearPeer.js"></script>
         <script src="js/YoloBearTournament.js"></script>
         <script src="js/Controller1.js"></script>
-        <link rel="stylesheet" type="text/css" href="css/index.css">
         <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap-3.3.2.min.css">
         <script src="js/vendor/bootstrap-3.3.2.min.js"></script>
         <script src="js/index.js"></script>
@@ -23,28 +22,41 @@
  
 <body class="container"> 
 
+        <div class="row">
+            <div class="muted pull-right">Yolo bear &nbsp; <img src="img/logo.jpeg" alt="logo" width=40 height=40></div>
+            <div hidden class="pull-left" id="backBtnDiv"><button class="btn" id="backBtn">Back</button></div>
+            <div hidden class="pull-left" id="backBtn2Div"><button class="btn" id="backBtn2">Back</button></div>
+        </div>
+
+        <div class="jumbotron" id="decideFollowCreate">
+        <!--   <h3>With Yolo Bear you can create a tournament, manage it, and broadcast it to other people's devices, or you can sit back and watch a broadcast of an existing tournament.</h3>-->
+           <a class="btn btn-lg btn-primary" id="decideFollowBtn">Follow</a> a tournament
+           <br>
+           <br>
+           <a class="btn btn-lg btn-info" id="decideCreateBtn">Broadcast</a> a tournament
+           
+        </div>
+
+<div id="tournamentDiv" hidden>
 <div class="row">
-    <div class="muted pull-left"><img src="img/logo.jpeg" alt="logo"> &nbsp; Yolo bear</div>
+<ul class="nav nav-pills nav-stacked">
+  <li><a id="Chat" class="btn btn-lg btn-info">Chat</a></li>
+  <li><a id="Teams" class="btn btn-lg">Teams</a></li>
+  <li><a id="Players" class="btn btn-lg">Players</a></li>
+  <li><a id="Games" class="btn btn-lg btn-primary">Games</a></li>
+</ul>
 </div>
-<div class="jumbotron" id="decideFollowCreate">
-<!--   <h3>With Yolo Bear you can create a tournament, manage it, and broadcast it to other people's devices, or you can sit back and watch a broadcast of an existing tournament.</h3>-->
-   <div class="row">
-   <a class="col-xs-4 col-xs-offset-1 btn btn-lg btn-primary" id="decideFollowBtn">Follow a tournament</a>
-   <a class="col-xs-4 col-xs-offset-1 btn btn-lg btn-info">Broadcast a tournament</a>
-   &nbsp;
-   </div>
 </div>
+
 <div ng-controller="Controller1" id="Controller1">
     <div ng-controller="YoloBearPeer">
-      <div class="pull-right pull-top">Your PeerJS id is : {{id}}</div>
       <div id="ybpConnectDiv" hidden>
       Admin is {{whoIsAdmin()}}, {{whoIsAdmin2()}}<br><br>
+      <div>Your id: {{id}}</div>
       Connect to peer: <input type="text" ng-model="rid" placeholder="Someone else's id">
-                       <button ng-click="connectOut(rid); rid=''; ">Connect</button>
-                       <button id="ybpConnectCancelBtn">Cancel</button>
-      </div>
-      <br><br>
-      
+                       <button ng-click="connectOut(rid); rid=''; " id="ybpConnectConnectBtn">Connect</button>
+
+
       <div id="chat_area" ng-show="peers().length>0">
         <input type="text" ng-model="msg" placeholder="Enter message">
         <ul>
@@ -64,75 +76,92 @@
     
         </ul>
       </div>
+
+      </div>
       
-    <br/>
-    </div><!-- end YoloBearPeer-->
 
-    Teams<br>
-    <ul>
-    <li ng-repeat="te in ybt.teams">
-        {{te.name}}
+     </div><!-- end YoloBearPeer-->
+
+
+    <div id="TeamsDiv" hidden>
+        Teams<br>
         <ul>
-        <li>Players: {{te.playersNames()}}</li>
-        <li>Won: {{te.gamesWon()}}, Lost: {{te.gamesLost()}}, Tied: {{te.gamesTied()}}</li>
+        <li ng-show="ybt.teams.length==0">None</li>
+        <li ng-repeat="te in ybt.teams">
+            {{te.name}}
+            <ul>
+            <li>Players: {{te.playersNames()}}</li>
+            <li>Won: {{te.gamesWon()}}, Lost: {{te.gamesLost()}}, Tied: {{te.gamesTied()}}</li>
+            </ul>
+        </li>
         </ul>
-    </li>
-    </ul>
-    New team<br>
-    <input type='text' ng-model="newTeam.name" placeholder="Name" required><br>
-    <button ng-click="addTeam()">Add</button>
-    <br>
+        <div ng-show="iAmAdmin()">
+            New team<br>
+            <input type='text' ng-model="newTeam.name" placeholder="Name" required><br>
+            <button ng-click="addTeam()">Add</button>
+        </div>
+    </div>
     
-    Players<br>
-    <ul><li ng-repeat="pl in ybt.players">{{pl.name}} - {{pl.team.name}}</li></ul>
-    New player<br>
-    <input type='text' ng-model="newPlayer.name" placeholder="Name" required><br>
-    <select size=5 ng-model="newPlayer.team" ng-options="te.id as te.name for te in ybt.teams"></select><br>
+    <div id="PlayersDiv" hidden>
+        Players<br>
+        <ul>
+            <li ng-show="ybt.players.length==0">None</li>
+            <li ng-repeat="pl in ybt.players">{{pl.name}} - {{pl.team.name}}</li>
+        </ul>
+        <div ng-show="iAmAdmin()">
+            New player<br>
+            <input type='text' ng-model="newPlayer.name" placeholder="Name" required><br>
+            <select size=5 ng-model="newPlayer.team" ng-options="te.id as te.name for te in ybt.teams"></select><br>
+            
+            <button ng-click="addPlayer()">Add</button>
+        </div>
+    </div>
     
-    <button ng-click="addPlayer()">Add</button>
-    <br>
-    
-    Games<br>
-    <ul><li ng-repeat="ga in ybt.games">
-    {{ga.team1.name}} ({{ga.teamScore(ga.team1.id)}})
-    x
-    {{ga.team2.name}} ({{ga.teamScore(ga.team2.id)}})
-    <select ng-model="ybt.games[ga.id].state">
-        <option value="Waiting">Waiting</option>
-        <option value="Playing">Playing</option>
-        <option value="Done">Done</option>
-    </select>
-    <table border=1>
-    <thead><tr><th>Team</th><th>Player</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th></tr></thead>
-    <tbody>
-        <tr ng-repeat="gps in ga.playerStats">
-          <td>{{gps.playerTeam.name}}</td>
-          <td>{{gps.playerName}}</td>
-          <td ng-repeat="sn in ybt.statNames">
-             {{gps[sn]}} &nbsp;
-             <button ng-click="setGamePlayerScore(ga,gps.playerId,sn,gps[sn]+1)" ng-disabled="ga.state!='Playing'">+</button> &nbsp;
-             <button ng-click="setGamePlayerScore(ga,gps.playerId,sn,gps[sn]-1)" ng-disabled="ga.state!='Playing'">-</button> &nbsp;
-          </td>
-        </tr>
-    </tbody>
-    </table>
-    </li></ul>
-    New game<br>
-    <select size=5 ng-model="newGame.team1" ng-options="te.id as te.name for te in ybt.teams"></select>
-    <select size=5 ng-model="newGame.team2" ng-options="te.id as te.name for te in ybt.teams"></select><br>
-    
-    <button ng-click="addGame()">Add</button>
-    <br>
-    
-    
-    
-</div>
+    <div id="GamesDiv" hidden>
+        Games<br>
+        <ul>
+        <li ng-show="ybt.games.length==0">None</li>
+        <li ng-repeat="ga in ybt.games">
+        {{ga.team1.name}} ({{ga.teamScore(ga.team1.id)}})
+        x
+        {{ga.team2.name}} ({{ga.teamScore(ga.team2.id)}})
+        <select ng-model="ybt.games[ga.id].state" ng-show="iAmAdmin()">
+            <option value="Waiting">Waiting</option>
+            <option value="Playing">Playing</option>
+            <option value="Done">Done</option>
+        </select>
+        <table border=1>
+        <thead><tr><th>Team</th><th>Player</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th></tr></thead>
+        <tbody>
+            <tr ng-repeat="gps in ga.playerStats">
+              <td>{{gps.playerTeam.name}}</td>
+              <td>{{gps.playerName}}</td>
+              <td ng-repeat="sn in ybt.statNames">
+                 {{gps[sn]}} &nbsp;
+                 <button ng-show="iAmAdmin()" ng-click="setGamePlayerScore(ga,gps.playerId,sn,gps[sn]+1)" ng-disabled="ga.state!='Playing'">+</button> &nbsp;
+                 <button ng-show="iAmAdmin()" ng-click="setGamePlayerScore(ga,gps.playerId,sn,gps[sn]-1)" ng-disabled="ga.state!='Playing'">-</button> &nbsp;
+              </td>
+            </tr>
+        </tbody>
+        </table>
+        </li></ul>
+        <div ng-show="iAmAdmin()">
+            New game<br>
+            <select size=5 ng-model="newGame.team1" ng-options="te.id as te.name for te in ybt.teams"></select>
+            <select size=5 ng-model="newGame.team2" ng-options="te.id as te.name for te in ybt.teams"></select><br>
+            <button ng-click="addGame()">Add</button>
+        </div>
+    </div> <!-- end Games div -->
 
-  
+   
+</div> <!-- end Controller1 -->
+
+<div hidden>  
   <br><br><br>
   <p style="font-size: 10px;">Your browser version: <span id="browsers"></span><br>
   Currently <strong>Google Chrome 26.0.1403.0 or above</strong> is required (Dev or Canary channels)</strong><br><br>For more up to date compatibility information see <a href="http://peerjs.com/status">PeerJS WebRTC Status</a><br><br>Note that this demo may also fail if you are behind stringent firewalls or both you and the remote peer and behind symmetric NATs.</p>
-  
+</div>
+
 </body> 
 </html> 
 

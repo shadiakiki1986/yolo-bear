@@ -52,7 +52,7 @@ function YoloBearPeer($scope) {
                     }
                     break;
                 case "tournament":
-                    if($scope.id!=wia) return; // only listen to first admin
+                    if(c.peer!=wia) return; // only listen to first admin
                     $scope.$emit('responseDataBroadcast',data.ybt);
                     break;
 		default: alert("undefined data type");
@@ -124,6 +124,7 @@ function YoloBearPeer($scope) {
     }
   });
 
+  $scope.$on('amIAdmin',function(event) { $scope.$parent.iAmAdminV=($scope.whoIsAdmin()==$scope.id); });
 
 
 }
