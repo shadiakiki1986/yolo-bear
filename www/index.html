@@ -12,6 +12,9 @@
         <script src="js/vendor/moment-2.9.0.min.js"></script>
         <script src="js/common.js"></script>
         <script src="js/YoloBearPeer.js"></script>
+        <script src="js/YoloBearPlayer.js"></script>
+        <script src="js/YoloBearTeam.js"></script>
+        <script src="js/YoloBearGame.js"></script>
         <script src="js/YoloBearTournament.js"></script>
         <script src="js/Controller1.js"></script>
         <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap-3.3.2.min.css">
@@ -106,7 +109,7 @@
         Players<br>
         <ul>
             <li ng-show="ybt.players.length==0">None</li>
-            <li ng-repeat="pl in ybt.players">{{pl.name}} - {{pl.team.name}}</li>
+            <li ng-repeat="pl in ybt.players">{{pl.name}} - {{pl.team().name}}</li>
         </ul>
         <div ng-show="iAmAdmin()">
             New player<br>
@@ -122,10 +125,10 @@
         <ul>
         <li ng-show="ybt.games.length==0">None</li>
         <li ng-repeat="ga in ybt.games">
-        {{ga.team1.name}} ({{ga.teamScore(ga.team1.id)}})
+        {{ga.team1().name}} ({{ga.teamScore(ga.team1().id)}})
         x
-        {{ga.team2.name}} ({{ga.teamScore(ga.team2.id)}})
-        <select ng-model="ybt.games[ga.id].state" ng-show="iAmAdmin()">
+        {{ga.team2().name}} ({{ga.teamScore(ga.team2().id)}})
+        <select ng-model="ybt.games[ga.id].state" ng-disabled="!iAmAdmin()" ng-change="requestDataBroadcast()">
             <option value="Waiting">Waiting</option>
             <option value="Playing">Playing</option>
             <option value="Done">Done</option>
@@ -133,7 +136,7 @@
         <table border=1>
         <thead><tr><th>Team</th><th>Player</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th></tr></thead>
         <tbody>
-            <tr ng-repeat="gps in ga.playerStats">
+            <tr ng-repeat="gps in ga.playerStats()">
               <td>{{gps.playerTeam.name}}</td>
               <td>{{gps.playerName}}</td>
               <td ng-repeat="sn in ybt.statNames">

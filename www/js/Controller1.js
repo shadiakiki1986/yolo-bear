@@ -15,11 +15,21 @@ $scope.addGame=function() {
 requestDataBroadcast=function() {
     $scope.$broadcast("requestDataBroadcast",angular.toJson($scope.ybt));
 };
+$scope.requestDataBroadcast=requestDataBroadcast;
 $scope.$on('responseDataBroadcast',function(event,ybt) {
   temp=angular.fromJson(ybt);
-  $scope.ybt.players=temp.players;
-  $scope.ybt.teams=temp.teams;
-  $scope.ybt.games=temp.games;
+  $scope.ybt.players=[];
+  for(var i=0;i<temp.players.length;i++) {
+    $scope.ybt.players.push(new YoloBearPlayer(temp.players[i],$scope.ybt));
+  }
+  $scope.ybt.teams=[];
+  for(var i=0;i<temp.teams.length;i++) {
+    $scope.ybt.teams.push(new YoloBearTeam(temp.teams[i],$scope.ybt));
+  }
+  $scope.ybt.games=[];
+  for(var i=0;i<temp.games.length;i++) {
+    $scope.ybt.games.push(new YoloBearGame(temp.games[i],$scope.ybt));
+  }
 });
 
 $scope.teamLost=function(tid) {
