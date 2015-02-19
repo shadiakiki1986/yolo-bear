@@ -17,4 +17,6 @@ function YoloBearPlayer(params,ybt) {
     });
   };
 
+  this.gamesStat=function(statName) { return self.gameStats.map(x=>x[statName]).reduce(function(a,b) { return a+b; },0); };
+
 }

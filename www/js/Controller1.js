@@ -3,10 +3,12 @@ $scope.ybt=new YoloBearTournament();
 $scope.addPlayer=function() {
     $scope.ybt.addPlayer($scope.newPlayer.name,$scope.newPlayer.team);
     requestDataBroadcast();
+    $scope.newPlayer={};
 };
 $scope.addTeam=function() {
     $scope.ybt.addTeam($scope.newTeam.name);
     requestDataBroadcast();
+    $scope.newTeam.name='';
 };
 $scope.addGame=function() {
     $scope.ybt.addGame($scope.newGame.team1,$scope.newGame.team2);
@@ -53,7 +55,7 @@ $scope.teamTie=function(tid) {
 };
 
 $scope.setGamePlayerScore=function(ga,gpsid,sn,sv) {
-  ga.setPlayerScore(gpsid,sn,sv);
+  ga.setPlayerStat(gpsid,sn,sv);
   requestDataBroadcast();
 };
 
@@ -61,5 +63,8 @@ $scope.setGamePlayerScore=function(ga,gpsid,sn,sv) {
     $scope.iAmAdmin = function(){
         $scope.$broadcast('amIAdmin');
         return  $scope.iAmAdminV;
-    }
+    };
+
+    $scope.showGamesState='Playing';
+
 }

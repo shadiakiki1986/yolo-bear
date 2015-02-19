@@ -2,6 +2,9 @@ I'm tring to follow Semantic Versioning 2.0.0
 http://semver.org/
 
 =V0.0.0=
+2015-02-19
+* further improvements to UI
+
 2015-02-18
 * finally got UI functional along with retested broadcasting
 ** had problem of javascript variable references not going through broadcast in json

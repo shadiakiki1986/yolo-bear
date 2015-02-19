@@ -39,6 +39,16 @@ this.addGame=function(t1id,t2id) {
   },this));
 };
 
+this.nGamesState=function(st) {
+  return this.games.filter(x=>(x.state==st)).length;
+};
 
+  this.playersSorted=function() { return this.players.sort(comparePlayers); };
+  this.teamsSorted=function() { return this.teams.sort(compareTeams); };
+  this.gamesByState=function(st) { return this.games.filter(x=>(x.state==st)); };
 
+  this.teamIdExists=function(id2) {
+    console.log(id2,this.teams.length,id2<this.teams.length);
+    return id2<this.teams.length;
+  };
 }

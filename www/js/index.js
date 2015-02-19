@@ -17,19 +17,24 @@
          $('#ybpConnectDiv').hide();
          $('#tournamentDiv').show();
     });
-
-    $('#backBtn').click(function() {
-       $('#ybpConnectDiv').hide();
-       $('#tournamentDiv').hide();
-       $('#backBtnDiv').hide();
-       $('#decideFollowCreate').show();
+    $('#ybpConnectContinueBtn').click(function() {
+         $('#ybpConnectDiv').hide();
+         $('#tournamentDiv').show();
     });
 
-    $('#Chat').click(function() {
+    $('#Chat,#Teams,#Players,#Games,#backBtn').click(function() {
        $('#tournamentDiv').hide();
        $('#backBtnDiv').hide();
-       $('#ybpConnectDiv').show();
+    });
+    $('#backBtn').click(function() {
+       $('#ybpConnectDiv').hide();
+       $('#decideFollowCreate').show();
+    });
+    $('#Chat,#Teams,#Players,#Games').click(function() {
        $('#backBtn2Div').show();
+    });
+    $('#Chat').click(function() {
+       $('#ybpConnectDiv').show();
     });
     $('#backBtn2').click(function() {
        $('#tournamentDiv').show();
@@ -37,28 +42,45 @@
        $('#ybpConnectDiv').hide();
        $('#TeamsDiv').hide();
        $('#PlayersDiv').hide();
-       $('#GamesDiv').hide();
+       $('#GamesStateDiv').hide();
        $('#backBtn2Div').hide();
     });
     $('#Teams').click(function() {
-       $('#tournamentDiv').hide();
-       $('#backBtnDiv').hide();
        $('#TeamsDiv').show();
-       $('#backBtn2Div').show();
     });
     $('#Players').click(function() {
-       $('#tournamentDiv').hide();
-       $('#backBtnDiv').hide();
        $('#PlayersDiv').show();
-       $('#backBtn2Div').show();
     });
     $('#Games').click(function() {
-       $('#tournamentDiv').hide();
-       $('#backBtnDiv').hide();
+       $('#GamesStateDiv').show();
+    });
+
+    $('#GamesDone,#GamesPlaying,#GamesWaiting').click(function() {
+       $('#GamesStateDiv').hide();
+       $('#backBtn2Div').hide();
        $('#GamesDiv').show();
+       $('#backBtn3Div').show();
+    });
+    $('#backBtn3').click(function() {
+       $('#GamesStateDiv').show();
        $('#backBtn2Div').show();
+       $('#GamesDiv').hide();
+       $('#backBtn3Div').hide();
     });
 
   });
 
 
+function comparePlayers(a,b) {
+  if(a.team().name < b.team().name) return -1;
+  if(a.team().name > b.team().name) return +1;
+  if(a.name < b.name) return -1;
+  if(a.name > b.name) return +1;
+  return 0;
+};
+
+function compareTeams(a,b) {
+  if(a.name < b.name) return -1;
+  if(a.name > b.name) return +1;
+  return 0;
+};

@@ -27,6 +27,11 @@ function YoloBearPeer($scope) {
         });
     });
 
+  $scope.isUnconnectedToAnyone=function() {
+	wia=$scope.whoIsAdmin();
+	wia2=$scope.whoIsAdmin2();
+	return($scope.id==wia&&wia2=="");
+  };
   
   $scope.connect=function(c) {
     $scope.msgs[c.peer]=[];
