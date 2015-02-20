@@ -6,8 +6,8 @@ this.team2Id=params.team2Id;
 this.state=params.state;
 var self=this;
 
-  this.team1=function() { return ybt.teams[self.team1Id]; }
-  this.team2=function() { return ybt.teams[self.team2Id]; }
+  this.team1=function() { return ybt.teamById(self.team1Id); }
+  this.team2=function() { return ybt.teamById(self.team2Id); }
   this.playerStats=function() {
     return ybt.players
       .filter(function(x) { return x.gameStats.filter(function(y) { return y.gid==self.id; }).length>0; })

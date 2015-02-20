@@ -10,6 +10,19 @@ $scope.addTeam=function() {
     requestDataBroadcast();
     $scope.newTeam.name='';
 };
+$scope.delTeam=function(tid) {
+   $scope.ybt.delTeam(tid);
+   requestDataBroadcast();
+};
+$scope.delPlayer=function(pid) {
+   $scope.ybt.delPlayer(pid);
+   requestDataBroadcast();
+};
+$scope.delGame=function(gid) {
+   $scope.ybt.delGame(gid);
+   requestDataBroadcast();
+};
+
 $scope.addGame=function() {
     $scope.ybt.addGame($scope.newGame.team1,$scope.newGame.team2);
     requestDataBroadcast();
@@ -68,5 +81,16 @@ $scope.setGamePlayerScore=function(ga,gpsid,sn,sv) {
     };
 
     $scope.showGamesState='Playing';
+
+  $scope.assignAdmin1=function(id) { $scope.$broadcast("assignAdmin1",id); };
+  $scope.assignAdmin2=function(id) { $scope.$broadcast("assignAdmin2",id); };
+
+  $scope.decideBroadcast=function() {
+    $scope.$broadcast("decideBroadcast");
+  };
+
+  $scope.copyToClipboard=function(text) {
+     window.prompt("Copy to clipboard: Ctrl+C, Enter", text);
+ };
 
 }

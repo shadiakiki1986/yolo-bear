@@ -8,7 +8,7 @@ function YoloBearPeer($scope) {
   $scope.admins={}; // associative array of timestamps, where the keys are the peer ids. This gives a sorted list of prioritization for being admin on the tournament
   $scope.alive={};
 
-    $scope.peer = new Peer({key: 'peerjs', host: 'localhost', port: 9000, path: '/', debug: false});
+    $scope.peer = new Peer({key: PEERJS_KEY, host: PEERJS_HOST, port: PEERJS_PORT, path: PEERJS_PATH, debug: false});
     $scope.peer.on('open', function(id){
       $scope.$apply(function() {
 	$scope.id=id;
@@ -33,10 +33,12 @@ function YoloBearPeer($scope) {
 	return($scope.id==wia&&wia2=="");
   };
   
+  $scope.dataReceiving=false;
   $scope.connect=function(c) {
     $scope.msgs[c.peer]=[];
     $scope.lists[c.peer]=[];
     c.on('data', function(data){ $scope.$apply(function() {
+        $scope.dataReceiving=true;
 	if(data.type) {
                 wia=$scope.whoIsAdmin();
                 wia2=$scope.whoIsAdmin2();
@@ -45,7 +47,7 @@ function YoloBearPeer($scope) {
                 case "listRequest": sendListResponse(c.peer); break;
                 case "dataRequest": $scope.$emit("gotDataRequest",c.peer); break;
 		case "listResponse":
-                    if(!($scope.id==wia&&wia2=="")&&!(c.peer==wia||c.peer==wia2)) return; // only listen to admins
+                    if(!($scope.id==wia&&wia2=="")&&!(c.peer==wia)) break; // only listen to admins
                     $scope.lists[c.peer]=Object.keys(data.admins);
                     $scope.admins=data.admins;
                     // update who I think the admins are
@@ -58,7 +60,7 @@ function YoloBearPeer($scope) {
                     }
                     break;
                 case "tournament":
-                    if(c.peer!=wia) return; // only listen to first admin
+                    if(c.peer!=wia) break; // only listen to first admin
                     $scope.$emit('responseDataBroadcast',data.ybt);
                     break;
 		default: alert("undefined data type");
@@ -66,6 +68,7 @@ function YoloBearPeer($scope) {
 	} else {
 		$scope.msgs[c.peer].push({ts:moment(),msg:data,to:$scope.id});
 	}
+        setTimeout(function() { $scope.$apply(function() { $scope.dataReceiving=false; }); }, 1000);
     }); });
     c.on('close', function(err){ $scope.$apply(function() {
         updatePeerStatus(c.peer);
@@ -77,7 +80,16 @@ function YoloBearPeer($scope) {
 
   connectOutId={};
   $scope.connectOut=function(id) {
-    if(connectOutId.hasOwnProperty(id)) return; // already pending request to connect
+    // if already connected
+    if($scope.conns.hasOwnProperty(id)) {
+        $scope.admins[id]=$scope.admins[$scope.whoIsAdmin()]-1;
+        sendListRequest(id);
+        sendDataRequest(id);
+        return;
+    }
+
+    // already pending request to connect
+    if(connectOutId.hasOwnProperty(id)) return;
     connectOutId[id]=setTimeout(function() { updatePeerStatus(id); delete connectOutId[id]; console.log("connect out timeout"); }, 5000); // must connect within 5 seconds
     c=$scope.peer.connect(id);
     c.on('open', function() { $scope.$apply(function() {
@@ -149,5 +161,20 @@ function YoloBearPeer($scope) {
 
   $scope.$on('amIAdmin',function(event) { $scope.$parent.iAmAdminV=($scope.whoIsAdmin()==$scope.id); });
 
+  $scope.$on("assignAdmin1",function(event,id) {
+    $scope.admins[id]=$scope.admins[$scope.whoIsAdmin()]-1000;
+    $scope.broadcastListResponse();
+  });
+  $scope.$on("assignAdmin2",function(event,id) {
+    $scope.admins[id]=$scope.admins[$scope.whoIsAdmin2()]-1;
+    $scope.broadcastListResponse();
+  });
+  $scope.$on("decideBroadcast",function(event) {
+    wia=$scope.whoIsAdmin();
+    if($scope.id!=wia&&!$scope.isUnconnectedToAnyone()) {
+      $scope.admins[$scope.id]=$scope.admins[wia]-1000;
+      $scope.$parent.ybt=new YoloBearTournament();
+    }
+  });
 
 }

@@ -8,6 +8,11 @@ References
 Server:
 * sudo npm install peer -g
 * peerjs --port 9000 --key peerjs
+* could use `openssl rand -base64 18` to generate random string for key
 
 Client
-* just launch the client in var/www/index.html
+* cp www/js/config-sample.js www/js/config.js
+* edit www/js/config.js and set correct key, port, host, ...
+* firefox www/index.html &
+* or build to app using cordova wrapper whose webview supports WebRTC
+** such as crosswalk

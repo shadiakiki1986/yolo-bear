@@ -5,7 +5,7 @@ function YoloBearPlayer(params,ybt) {
   this.name=params.name;
   this.teamId=params.teamId;
   this.gameStats=params.gameStats;
-  this.team=function() { return ybt.teams[self.teamId]; };
+  this.team=function() { return ybt.teamById(self.teamId); };
   this.addGameStats=function(gid) {
     self.gameStats.push({
       gid:gid,

@@ -18,11 +18,6 @@
          $('#ybpConnectDiv').hide();
          $('#tournamentDiv').show();
     });
-    $('#ybpConnectContinueBtn').click(function() {
-         $('#ybpConnectDiv').hide();
-         $('#tournamentDiv').show();
-    });
-
     $('#Chat,#Teams,#Players,#Games,#backBtn').click(function() {
        $('#tournamentDiv').hide();
        $('#backBtnDiv').hide();

@@ -4,6 +4,10 @@ http://semver.org/
 =V0.0.0=
 2015-02-20
 * UI: broadcasting icon, admin icon, connected icon, disconnected icon
+* UI: copy to clipboard, Connect tab simplified
+* DEL buttons
+* Assign admin 1 + Assign admin 2
+* Can now split for existing tournament and broadcast a new tournament
 
 2015-02-19
 * further improvements to UI

@@ -5,31 +5,48 @@ this.teams=[];
 this.games=[];
 this.statNames=["Score","Assists","Rebounds","Steals","Blockshots"];
 
-this.addPlayer=function(n,tid) {
+this.newId=function(aaa) {
+  return aaa.map(x=>x.id).reduce(function(a,b) { return Math.max(a,b)+1; },0);
+};
 
-  this.players.push(new YoloBearPlayer({
-    id:this.players.length,
+this.addPlayer=function(n,tid) {
+  // init
+  nybp=new YoloBearPlayer({
+    id:this.newId(this.players),
     name:n,
     teamId:tid,
     gameStats:[]
-  }, this));
+  }, this);
+  // if this player's team is already playing any games, then the stats should be added here
+  this.games.filter(x=>(x.team1Id==tid||x.team2Id==tid)).map(x=>nybp.addGameStats(x.id));
+  // add
+  this.players.push(nybp);
+  this.players.sort(comparePlayers);
 };
 
 this.addTeam=function(n) {
   this.teams.push(new YoloBearTeam({
-    id: this.teams.length,
+    id: this.newId(this.teams),
     name:n
   },this));
+  this.teams.sort(compareTeams);
 };
 
 this.addGame=function(t1id,t2id) {
   // make a copy of the players ... to be augmented with scores
-  var gid=this.games.length;
-  this.teams[t1id]
+  var gid=this.newId(this.games);
+  this.teamById(t1id)
     .players()
-    .concat(this.teams[t2id].players())
+    .concat(this.teamById(t2id).players())
     .map(function(x) { return x.addGameStats(gid); })
   ;
+
+  // swap if needed
+  if(this.teamById(t1id).name>this.teamById(t2id).name) {
+     temp=t1id;
+     t1id=t2id;
+     t2id=temp;
+  }
 
   this.games.push(new YoloBearGame({
     id:gid,
@@ -39,15 +56,37 @@ this.addGame=function(t1id,t2id) {
   },this));
 };
 
+this.teamFilterId=function(tid) { return this.teams.filter(x=>(x.id==tid)); };
+this.teamIdExists=function(tid) { return this.teamFilterId(tid).length>0; };
+this.teamById=function(tid) {
+    tfi=this.teamFilterId(tid);
+    if(tfi.length==0) return null;
+    return tfi[0];
+};
+
 this.nGamesState=function(st) {
   return this.games.filter(x=>(x.state==st)).length;
 };
 
-  this.playersSorted=function() { return this.players.sort(comparePlayers); };
-  this.teamsSorted=function() { return this.teams.sort(compareTeams); };
   this.gamesByState=function(st) { return this.games.filter(x=>(x.state==st)); };
 
-  this.teamIdExists=function(id2) {
-    return id2<this.teams.length;
+
+  this.delTeam=function(tid) {
+    if(this.teamById(tid).players().length>0) {
+       alert("Please delete the players on this team before deleting the team.");
+    } else {
+       if(this.games.filter(x=>(x.team1Id==tid||x.team2Id==tid)).length>0) {
+          alert("Please delete the games played by this teams before deleting the team");
+       } else {
+          this.teams=this.teams.filter(x=>(x.id!=tid));
+       }
+    }
   };
+  this.delPlayer=function(pid) { this.players=this.players.filter(x=>(x.id!=pid)); };
+  this.delGame=function(gid) {
+     this.games=this.games.filter(x=>(x.id!=gid));
+     this.players.map(x=>(x.gameStats=x.gameStats.filter(y=>y.gid!=gid)));
+  };
+
+
 }

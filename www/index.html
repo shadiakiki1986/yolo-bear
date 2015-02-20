@@ -10,6 +10,7 @@
         <script src="js/vendor/angular-1.2.28.min.js"></script>
         <script src="js/vendor/peer-0.3.0.min.js"></script>
         <script src="js/vendor/moment-2.9.0.min.js"></script>
+        <script src="js/config.js"></script>
         <script src="js/common.js"></script>
         <script src="js/YoloBearPeer.js"></script>
         <script src="js/YoloBearPlayer.js"></script>
@@ -33,16 +34,17 @@
             <div hidden class="pull-left" id="backBtn3Div"><button class="btn" id="backBtn3">Back</button></div>
         </div>
 
-        <div class="jumbotron" id="decideFollowCreate">
-        <!--   <h3>With Yolo Bear you can create a tournament, manage it, and broadcast it to other people's devices, or you can sit back and watch a broadcast of an existing tournament.</h3>-->
-           <a class="btn btn-lg btn-primary" id="decideFollowBtn">Follow</a> a tournament
-           <br>
-           <br>
-           <a class="btn btn-lg btn-info" id="decideCreateBtn">Broadcast</a> a tournament
-           
-        </div>
-
 <div ng-controller="Controller1" id="Controller1">
+
+<div class="jumbotron" id="decideFollowCreate">
+<!--   <h3>With Yolo Bear you can create a tournament, manage it, and broadcast it to other people's devices, or you can sit back and watch a broadcast of an existing tournament.</h3>-->
+   <a class="btn btn-lg btn-primary" id="decideFollowBtn">Follow</a> a tournament
+   <br>
+   <br>
+   <a class="btn btn-lg btn-info" id="decideCreateBtn" ng-click="decideBroadcast()">Broadcast</a> a tournament
+   
+</div>
+
 
 <div id="tournamentDiv" hidden>
 <div class="row">
@@ -59,7 +61,8 @@
     <div ng-controller="YoloBearPeer">
       <div id="onoff">
           <span ng-show="isUnconnectedToAnyone()"><img src="img/off.png" alt="Off" height=25 width=25></span>
-          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id"><img src="img/on.png" alt="On" height=25 width=25></span>
+          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&&!dataReceiving"><img src="img/on.png" alt="On" height=25 width=25></span>
+          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&&dataReceiving"><img src="img/onf.png" alt="On" height=25 width=25></span>
       </div>
       <div ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id" id="micro">
           <span ng-show="doingDataBroadcast"><img src="img/micro_on.png" alt="Broadcasting" height=25 width=25></span>
@@ -67,30 +70,38 @@
       </div>
 
       <div id="ybpConnectDiv" hidden>
-      Admin is {{whoIsAdmin()}}, {{whoIsAdmin2()}}<br><br>
+<!--      Admin is {{whoIsAdmin()}}, {{whoIsAdmin2()}}<br><br>
       <div>Your id: {{id}}</div>
-      <div ng-show="!isUnconnectedToAnyone()"><button id="ybpConnectContinueBtn">Continue</button> existing tournament</div>
+      <div ng-show="!isUnconnectedToAnyone()"><button id="ybpConnectContinueBtn">Continue</button> existing tournament</div>-->
       Connect to peer: <input type="text" ng-model="rid" placeholder="Someone else's id">
                        <button ng-click="connectOut(rid); rid=''; " id="ybpConnectConnectBtn">Connect</button>
 
 
-      <div id="chat_area" ng-show="peers().length>0">
-        <input type="text" ng-model="msg" placeholder="Enter message">
+      <div id="chat_area"><!-- ng-show="peers().length>0"> -->
+<!--        <input type="text" ng-model="msg" placeholder="Enter message">-->
         <ul>
-        <li ng-repeat="p in peers()">
-    	{{p}} &nbsp; {{peerList(p)}} &nbsp;
-    	<button ng-click="send(p);" ng-show="p!=id" ng-disabled="!alive[p]">Send</button>
-    	<ul>
-    	<li ng-repeat="pm in peerMsgs(p)">{{pm.ts}}: {{pm.msg}}</li>
-    	</ul>
-        </li>
         <li>
-    	{{id}} &nbsp; (me)
+    	{{id}}
+        <span ng-show="id==whoIsAdmin()" >* </span>
+        <span ng-show="id==whoIsAdmin2()">**</span>
+        &nbsp; (me)
+        <button ng-click="copyToClipboard(id)">Copy</button>
     	<ul>
-    	<li ng-repeat="pm in peerMsgs(id)">{{pm.ts}}: {{pm.msg}}</li>
+    	  <li ng-repeat="pm in peerMsgs(id)">{{pm.ts}}: {{pm.msg}}</li>
     	</ul>
         </li>
-    
+        <li ng-repeat="p in peers()">
+    	  {{p}}
+          <span ng-show="p==whoIsAdmin()" >* </span>
+          <span ng-show="p==whoIsAdmin2()">**</span>
+          &nbsp; {{peerList(p)}} &nbsp;
+<!--    	  <button ng-click="send(p)" ng-disabled="!alive[p]">Send</button>-->
+    	  <button ng-click="assignAdmin1(p)" ng-disabled="id!=whoIsAdmin() || !alive[p]" ng-show="iAmAdmin()">&gt; A1</button>
+    	  <button ng-click="assignAdmin2(p)" ng-disabled="id!=whoIsAdmin() || p==whoIsAdmin2() || !alive[p]" ng-show="iAmAdmin()">&gt; A2</button>
+    	  <ul>
+    	  <li ng-repeat="pm in peerMsgs(p)">{{pm.ts}}: {{pm.msg}}</li>
+    	  </ul>
+        </li>
         </ul>
       </div>
 
@@ -106,9 +117,9 @@
         </div>
         <div ng-show="ybt.teams.length==0">None</div>
         <table ng-show="ybt.teams.length>0" class="table">
-        <thead><tr><th>Team</th><th>Won</th><th>Lost</th><th>Tie</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th><th>Players</th></tr></thead>
+        <thead><tr><th>Team</th><th>Won</th><th>Lost</th><th>Tie</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th><th>Players</th><th></th></tr></thead>
         <tbody>
-            <tr ng-repeat="te in ybt.teamsSorted()">
+            <tr ng-repeat="te in ybt.teams">
               <td>{{te.name}}</td>
               <td>{{te.gamesWon()}}</td>
               <td>{{te.gamesLost()}}</td>
@@ -117,6 +128,7 @@
                  {{te.gamesStat(sn)}}
               </td>
               <td>{{te.playersNames()}}</td>
+              <td><button ng-show="iAmAdmin()" ng-click="delTeam(te.id)" class="btn btn-danger">Del</button></td>
             </tr>
         </tbody>
         </table>
@@ -135,14 +147,15 @@
         Players<br>
         <span ng-show="ybt.players.length==0">None</span>
         <table ng-show="ybt.players.length>0" class="table">
-        <thead><tr><th>Team</th><th>Player</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th></tr></thead>
+        <thead><tr><th>Team</th><th>Player</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th><th></th></tr></thead>
         <tbody>
-            <tr ng-repeat="pl in ybt.playersSorted()">
+            <tr ng-repeat="pl in ybt.players">
               <td>{{pl.team().name}}</td>
               <td>{{pl.name}}</td>
               <td ng-repeat="sn in ybt.statNames">
                  {{pl.gamesStat(sn)}}
               </td>
+              <td><button ng-show="iAmAdmin()" ng-click="delPlayer(pl.id)" class="btn btn-danger">Del</button></td>
             </tr>
         </tbody>
         </table>
@@ -173,11 +186,12 @@
         {{ga.team1().name}} ({{ga.teamStat(ga.team1().id,'Score')}})
         x
         {{ga.team2().name}} ({{ga.teamStat(ga.team2().id,'Score')}})
-        <select ng-model="ybt.games[ga.id].state" ng-disabled="!iAmAdmin()" ng-change="requestDataBroadcast()">
+        <select ng-model="ga.state" ng-disabled="!iAmAdmin()" ng-change="requestDataBroadcast()">
             <option value="Waiting">Waiting</option>
             <option value="Playing">Playing</option>
             <option value="Done">Done</option>
         </select>
+        <button ng-show="iAmAdmin()" ng-click="delGame(ga.id)" class="btn btn-danger">Del</button>
         <table class="table" ng-show="showGamesState!='Waiting'">
         <thead><tr><th>Team</th><th>Player</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th></tr></thead>
         <tbody>
