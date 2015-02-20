@@ -43,6 +43,7 @@ function YoloBearPeer($scope) {
 
 		switch(data.type) {
                 case "listRequest": sendListResponse(c.peer); break;
+                case "dataRequest": $scope.$emit("gotDataRequest",c.peer); break;
 		case "listResponse":
                     if(!($scope.id==wia&&wia2=="")&&!(c.peer==wia||c.peer==wia2)) return; // only listen to admins
                     $scope.lists[c.peer]=Object.keys(data.admins);
@@ -83,6 +84,7 @@ function YoloBearPeer($scope) {
         if(connectOutId.hasOwnProperty(id)) { clearTimeout(connectOutId[id]); delete connectOutId[id]; }
 	$scope.connect(c);
         sendListRequest(id);
+        sendDataRequest(id);
     }); });
     c.on('error', function(err){ alert("Failed to connect to "+c.peer); });
   };
@@ -112,6 +114,10 @@ function YoloBearPeer($scope) {
   sendListRequest=function(id) {
     $scope.conns[id].send({type:"listRequest"});
   };
+  sendDataRequest=function(id) {
+    $scope.conns[id].send({type:"dataRequest"});
+  };
+
 
 
 
@@ -121,11 +127,23 @@ function YoloBearPeer($scope) {
   $scope.whoIsAdmin= id => Object.keys($scope.admins).filter(x => $scope.admins[x]==Object.values($scope.admins).min())[0];
   $scope.whoIsAdmin2= id => (Object.keys($scope.admins).length<=1?"":Object.keys($scope.admins).filter(x => $scope.admins[x]==Object.values($scope.admins).diff(Object.values($scope.admins).min()).min())[0]);
 
+  $scope.doingDataBroadcast=false;
+  doingDataBroadcastId=null;
   $scope.$on('requestDataBroadcast',function(event,ybt) {
     if($scope.id==$scope.whoIsAdmin()||$scope.id==$scope.whoIsAdmin2()) {
+      $scope.doingDataBroadcast=true;
       $scope.peers().map(function(x) { if($scope.alive[x]) {
         $scope.conns[x].send({type:"tournament",ybt:ybt});
       } });
+      if(doingDataBroadcastId==null) doingDataBroadcastId=setTimeout(function() { $scope.$apply(function() { $scope.doingDataBroadcast=false; }); doingDataBroadcastId=null; }, 1000);
+    }
+  });
+
+  $scope.$on('requestDataBroadcast2',function(event,ybt,peerId) {
+    if($scope.id==$scope.whoIsAdmin()||$scope.id==$scope.whoIsAdmin2()) {
+      if($scope.alive[peerId]) {
+        $scope.conns[peerId].send({type:"tournament",ybt:ybt});
+      }
     }
   });
 

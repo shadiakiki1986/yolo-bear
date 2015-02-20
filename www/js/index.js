@@ -2,15 +2,16 @@
     // Show browser version
     $('#browsers').text(navigator.userAgent);
 
-    $('#decideFollowBtn').click(function() {
+    $('#decideFollowBtn,#decideCreateBtn').click(function() {
        $('#decideFollowCreate').hide();
-       $('#ybpConnectDiv').show();
        $('#backBtnDiv').show();
     });
+
+    $('#decideFollowBtn').click(function() {
+       $('#ybpConnectDiv').show();
+    });
     $('#decideCreateBtn').click(function() {
-       $('#decideFollowCreate').hide();
        $('#tournamentDiv').show();
-       $('#backBtnDiv').show();
     });
 
     $('#ybpConnectConnectBtn').click(function() {

@@ -48,7 +48,6 @@ this.nGamesState=function(st) {
   this.gamesByState=function(st) { return this.games.filter(x=>(x.state==st)); };
 
   this.teamIdExists=function(id2) {
-    console.log(id2,this.teams.length,id2<this.teams.length);
     return id2<this.teams.length;
   };
 }

@@ -57,6 +57,15 @@
 
 
     <div ng-controller="YoloBearPeer">
+      <div id="onoff">
+          <span ng-show="isUnconnectedToAnyone()"><img src="img/off.png" alt="Off" height=25 width=25></span>
+          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id"><img src="img/on.png" alt="On" height=25 width=25></span>
+      </div>
+      <div ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id" id="micro">
+          <span ng-show="doingDataBroadcast"><img src="img/micro_on.png" alt="Broadcasting" height=25 width=25></span>
+          <span ng-show="!doingDataBroadcast"><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
+      </div>
+
       <div id="ybpConnectDiv" hidden>
       Admin is {{whoIsAdmin()}}, {{whoIsAdmin2()}}<br><br>
       <div>Your id: {{id}}</div>
@@ -145,7 +154,7 @@
             New game<br>
             <select size=5 ng-model="newGame.team1" ng-options="te.id as te.name for te in ybt.teams"></select>
             <select size=5 ng-model="newGame.team2" ng-options="te.id as te.name for te in ybt.teams"></select><br>
-            <button ng-click="addGame()">Add</button>
+            <button ng-click="addGame()" ng-disabled="newGame.team1==newGame.team2||!ybt.teamIdExists(newGame.team1)||!ybt.teamIdExists(newGame.team2)">Add</button>
         </div>
 
         <div class="row">

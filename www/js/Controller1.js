@@ -13,10 +13,11 @@ $scope.addTeam=function() {
 $scope.addGame=function() {
     $scope.ybt.addGame($scope.newGame.team1,$scope.newGame.team2);
     requestDataBroadcast();
+    $scope.newGame={};
 };
-requestDataBroadcast=function() {
-    $scope.$broadcast("requestDataBroadcast",angular.toJson($scope.ybt));
-};
+requestDataBroadcast =function() { $scope.$broadcast("requestDataBroadcast",angular.toJson($scope.ybt)); };
+requestDataBroadcast2=function(peerId) { $scope.$broadcast("requestDataBroadcast2",angular.toJson($scope.ybt),peerId); };
+
 $scope.requestDataBroadcast=requestDataBroadcast;
 $scope.$on('responseDataBroadcast',function(event,ybt) {
   temp=angular.fromJson(ybt);
@@ -33,6 +34,7 @@ $scope.$on('responseDataBroadcast',function(event,ybt) {
     $scope.ybt.games.push(new YoloBearGame(temp.games[i],$scope.ybt));
   }
 });
+$scope.$on('gotDataRequest',function(event,peerId) { requestDataBroadcast2(peerId); });
 
 $scope.teamLost=function(tid) {
   return $scope.ybt.games
