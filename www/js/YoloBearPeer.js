@@ -8,7 +8,7 @@ function YoloBearPeer($scope) {
   $scope.admins={}; // associative array of timestamps, where the keys are the peer ids. This gives a sorted list of prioritization for being admin on the tournament
   $scope.alive={};
 
-    $scope.peer = new Peer({key: PEERJS_KEY, host: PEERJS_HOST, port: PEERJS_PORT, path: PEERJS_PATH, debug: false});
+    $scope.peer = new Peer({key: PEERJS_KEY, host: PEERJS_HOST, port: PEERJS_PORT, path: PEERJS_PATH, debug: PEERJS_DEBUG});
     $scope.peer.on('open', function(id){
       $scope.$apply(function() {
 	$scope.id=id;
