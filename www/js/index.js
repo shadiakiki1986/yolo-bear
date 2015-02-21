@@ -2,17 +2,14 @@
     // Show browser version
     $('#browsers').text(navigator.userAgent);
 
-    $('#decideFollowBtn,#decideCreateBtn').click(function() {
+    $('#decideFollowBtn,#decideCreateBtn,#decideContinueBtn').click(function() {
        $('#decideFollowCreate').hide();
        $('#backBtnDiv').show();
     });
 
-    $('#decideFollowBtn').click(function() {
-       $('#ybpConnectDiv').show();
-    });
-    $('#decideCreateBtn').click(function() {
-       $('#tournamentDiv').show();
-    });
+    $('#decideFollowBtn').click(function() { $('#ybpConnectDiv').show(); });
+    $('#decideCreateBtn').click(function() { $('#tournamentDiv').show(); });
+    $('#decideContinueBtn').click(function() { $('#tournamentDiv').show(); });
 
     $('#ybpConnectConnectBtn').click(function() {
          $('#ybpConnectDiv').hide();

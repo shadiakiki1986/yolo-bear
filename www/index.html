@@ -36,15 +36,6 @@
 
 <div ng-controller="Controller1" id="Controller1">
 
-<div class="jumbotron" id="decideFollowCreate">
-<!--   <h3>With Yolo Bear you can create a tournament, manage it, and broadcast it to other people's devices, or you can sit back and watch a broadcast of an existing tournament.</h3>-->
-   <a class="btn btn-lg btn-primary" id="decideFollowBtn">Follow</a> a tournament
-   <br>
-   <br>
-   <a class="btn btn-lg btn-info" id="decideCreateBtn" ng-click="decideBroadcast()">Broadcast</a> a tournament
-   
-</div>
-
 
 <div id="tournamentDiv" hidden>
 <div class="row">
@@ -59,14 +50,25 @@
 
 
     <div ng-controller="YoloBearPeer">
+<div class="jumbotron" id="decideFollowCreate">
+<!--   <h3>With Yolo Bear you can create a tournament, manage it, and broadcast it to other people's devices, or you can sit back and watch a broadcast of an existing tournament.</h3>-->
+   <a class="btn btn-lg btn-primary" id="decideFollowBtn">Follow</a> an existing tournament
+   <br>
+   <br>
+   <a class="btn btn-lg btn-info" id="decideCreateBtn" ng-click="decideBroadcast()">Broadcast</a> a new tournament
+   <span ng-show="!isUnconnectedToAnyone()">
+   <br>
+   <br>
+   <a class="btn btn-lg btn-default" id="decideContinueBtn">Continue</a> the current tournament
+   </span>
+</div>
+
       <div id="onoff">
           <span ng-show="isUnconnectedToAnyone()"><img src="img/off.png" alt="Off" height=25 width=25></span>
           <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&&!dataReceiving"><img src="img/on.png" alt="On" height=25 width=25></span>
           <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&&dataReceiving"><img src="img/onf.png" alt="On" height=25 width=25></span>
-      </div>
-      <div ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id" id="micro">
-          <span ng-show="doingDataBroadcast"><img src="img/micro_on.png" alt="Broadcasting" height=25 width=25></span>
-          <span ng-show="!doingDataBroadcast"><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
+          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&&doingDataBroadcast"><img src="img/micro_on.png" alt="Broadcasting" height=25 width=25></span>
+          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&&!doingDataBroadcast"><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
       </div>
 
       <div id="ybpConnectDiv" hidden>
