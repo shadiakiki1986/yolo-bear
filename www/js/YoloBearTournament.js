@@ -54,6 +54,8 @@ this.addGame=function(t1id,t2id) {
     team2Id:t2id,
     state: "Waiting",
   },this));
+
+  this.games.sort(compareGames);
 };
 
 this.teamFilterId=function(tid) { return this.teams.filter(function(x) { return (x.id==tid); }); };

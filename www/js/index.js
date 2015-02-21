@@ -77,3 +77,11 @@ function compareTeams(a,b) {
   if(a.name > b.name) return +1;
   return 0;
 };
+
+function compareGames(a,b) {
+  if(a.team1().name < b.team1().name) return -1;
+  if(a.team1().name > b.team1().name) return +1;
+  if(a.team2().name < b.team2().name) return -1;
+  if(a.team2().name > b.team2().name) return +1;
+  return 0;
+};

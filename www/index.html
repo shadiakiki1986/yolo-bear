@@ -165,13 +165,6 @@
     </div>
     
     <div id="GamesStateDiv" hidden>
-        <div ng-show="iAmAdmin()">
-            New game<br>
-            <select size=5 ng-model="newGame.team1" ng-options="te.id as te.name for te in ybt.teams"></select>
-            <select size=5 ng-model="newGame.team2" ng-options="te.id as te.name for te in ybt.teams"></select><br>
-            <button ng-click="addGame()" ng-disabled="newGame.team1==newGame.team2||!ybt.teamIdExists(newGame.team1)||!ybt.teamIdExists(newGame.team2)">Add</button>
-        </div>
-
         <div class="row">
         <ul class="nav nav-pills nav-stacked">
           <li><a id="GamesDone" class="btn btn-lg btn-primary" ng-click="showGamesState='Done'">Done<span class="badge">{{ybt.nGamesState('Done')}}</span></a></li>
@@ -183,6 +176,15 @@
 
     <div id="GamesDiv" hidden>
         Games<br>
+        <div ng-show="iAmAdmin()&&showGamesState=='Waiting'">
+            New game<br>
+            <select ng-model="newGame.team1" ng-options="te.id as te.name for te in ybt.teams"></select> &nbsp;
+            <select ng-model="newGame.team2" ng-options="te.id as te.name for te in ybt.teams"></select> &nbsp;
+            <button ng-click="addGame()" ng-disabled="newGame.team1==newGame.team2||!ybt.teamIdExists(newGame.team1)||!ybt.teamIdExists(newGame.team2)">Add</button>
+            <br>
+        </div>
+
+
         <div ng-show="ybt.gamesByState(showGamesState).length==0">{{showGamesState}}: None</div>
         <div ng-repeat="ga in ybt.gamesByState(showGamesState)">
         {{ga.team1().name}} ({{ga.teamStat(ga.team1().id,'Score')}})
@@ -193,7 +195,7 @@
             <option value="Playing">Playing</option>
             <option value="Done">Done</option>
         </select>
-        <button ng-show="iAmAdmin()" ng-click="delGame(ga.id)" class="btn btn-danger">Del</button>
+        <button ng-show="iAmAdmin()" ng-click="delGame(ga.id)" class="btn btn-small btn-danger">Del</button>
         <table class="table" ng-show="showGamesState!='Waiting'">
         <thead><tr><th>Team</th><th>Player</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th></tr></thead>
         <tbody>
