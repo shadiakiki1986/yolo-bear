@@ -7,9 +7,8 @@ References
 
 Server:
 * sudo npm install peer -g
-* peerjs --port 9000 --key peerjs
-* could use `openssl rand -base64 18` to generate random string for key
 * peerjs --port 9000 --key peerjs --path /yolo-bear --debug
+** could use `openssl rand -base64 18` to generate random string for key
 
 Client
 * cp www/js/config-sample.js www/js/config.js
@@ -17,3 +16,9 @@ Client
 * firefox www/index.html &
 * or build to app using cordova wrapper whose webview supports WebRTC
 ** such as crosswalk
+
+Mobile app
+* built with crosswalk (not cordova)
+** since the default webview in android <4.4 does not support webrtc
+** this results in a 17MB apk file (vs 2MB apk file with cordova)
+* check crosswalk_install.sh
