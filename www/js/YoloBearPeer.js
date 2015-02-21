@@ -136,8 +136,8 @@ function YoloBearPeer($scope) {
   $scope.peers=function() { return Object.keys($scope.conns); };
   $scope.peerMsgs=function(id) { return $scope.msgs[id]; };
   $scope.peerList=function(id) { if($scope.peers()<=1) return ""; else return "("+$scope.lists[id].filter(function(x) { return $scope.peers().indexOf(x)==-1 && x!=$scope.id; }).join()+")"; };
-  $scope.whoIsAdmin= id => Object.keys($scope.admins).filter(x => $scope.admins[x]==Object.values($scope.admins).min())[0];
-  $scope.whoIsAdmin2= id => (Object.keys($scope.admins).length<=1?"":Object.keys($scope.admins).filter(x => $scope.admins[x]==Object.values($scope.admins).diff(Object.values($scope.admins).min()).min())[0]);
+  $scope.whoIsAdmin=function() { return Object.keys($scope.admins).filter(function(x) { return $scope.admins[x]==Object.values($scope.admins).min(); })[0]; };
+  $scope.whoIsAdmin2= function() { return (Object.keys($scope.admins).length<=1?"":Object.keys($scope.admins).filter(function(x) { return $scope.admins[x]==Object.values($scope.admins).diff(Object.values($scope.admins).min()).min(); })[0]); };
 
   $scope.doingDataBroadcast=false;
   doingDataBroadcastId=null;

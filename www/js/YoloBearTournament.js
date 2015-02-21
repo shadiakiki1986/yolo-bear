@@ -6,7 +6,7 @@ this.games=[];
 this.statNames=["Score","Assists","Rebounds","Steals","Blockshots"];
 
 this.newId=function(aaa) {
-  return aaa.map(x=>x.id).reduce(function(a,b) { return Math.max(a,b)+1; },0);
+  return aaa.map(function(x) { return x.id; }).reduce(function(a,b) { return Math.max(a,b)+1; },0);
 };
 
 this.addPlayer=function(n,tid) {
@@ -18,7 +18,7 @@ this.addPlayer=function(n,tid) {
     gameStats:[]
   }, this);
   // if this player's team is already playing any games, then the stats should be added here
-  this.games.filter(x=>(x.team1Id==tid||x.team2Id==tid)).map(x=>nybp.addGameStats(x.id));
+  this.games.filter(function(x) { return (x.team1Id==tid||x.team2Id==tid); }).map(function(x) { return nybp.addGameStats(x.id); });
   // add
   this.players.push(nybp);
   this.players.sort(comparePlayers);
@@ -56,7 +56,7 @@ this.addGame=function(t1id,t2id) {
   },this));
 };
 
-this.teamFilterId=function(tid) { return this.teams.filter(x=>(x.id==tid)); };
+this.teamFilterId=function(tid) { return this.teams.filter(function(x) { return (x.id==tid); }); };
 this.teamIdExists=function(tid) { return this.teamFilterId(tid).length>0; };
 this.teamById=function(tid) {
     tfi=this.teamFilterId(tid);
@@ -65,27 +65,27 @@ this.teamById=function(tid) {
 };
 
 this.nGamesState=function(st) {
-  return this.games.filter(x=>(x.state==st)).length;
+  return this.games.filter(function(x) { return (x.state==st); }).length;
 };
 
-  this.gamesByState=function(st) { return this.games.filter(x=>(x.state==st)); };
+  this.gamesByState=function(st) { return this.games.filter(function(x) { return (x.state==st); }); };
 
 
   this.delTeam=function(tid) {
     if(this.teamById(tid).players().length>0) {
        alert("Please delete the players on this team before deleting the team.");
     } else {
-       if(this.games.filter(x=>(x.team1Id==tid||x.team2Id==tid)).length>0) {
+       if(this.games.filter(function(x) { return (x.team1Id==tid||x.team2Id==tid); }).length>0) {
           alert("Please delete the games played by this teams before deleting the team");
        } else {
-          this.teams=this.teams.filter(x=>(x.id!=tid));
+          this.teams=this.teams.filter(function(x) { return (x.id!=tid); });
        }
     }
   };
-  this.delPlayer=function(pid) { this.players=this.players.filter(x=>(x.id!=pid)); };
+  this.delPlayer=function(pid) { this.players=this.players.filter(function(x) { return (x.id!=pid); }); };
   this.delGame=function(gid) {
-     this.games=this.games.filter(x=>(x.id!=gid));
-     this.players.map(x=>(x.gameStats=x.gameStats.filter(y=>y.gid!=gid)));
+     this.games=this.games.filter(function(x) { return (x.id!=gid); });
+     this.players.map(function(x) { return (x.gameStats=x.gameStats.filter(function(y) { return y.gid!=gid; })); });
   };
 
 
