@@ -1,0 +1,13 @@
+{
+  "name": "Yolo bear",
+  "xwalk_version": "0.0.0.1",
+  "start_url": "www/index.html",
+  "icons": [
+    {
+      "src": "www/img/logo_128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "density": "4.0"
+    }
+  ]
+}

@@ -2,6 +2,9 @@ I'm tring to follow Semantic Versioning 2.0.0
 http://semver.org/
 
 =V0.0.0=
+2015-02-21
+* building app with crosswalk https://crosswalk-project.org
+
 2015-02-20
 * UI: broadcasting icon, admin icon, connected icon, disconnected icon
 * UI: copy to clipboard, Connect tab simplified
