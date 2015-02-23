@@ -13,6 +13,7 @@
         <script src="js/config.js"></script>
         <script src="js/common.js"></script>
         <script src="js/YoloBearPeer.js"></script>
+        <script src="js/YoloBearPeerCore.js"></script>
         <script src="js/YoloBearPlayer.js"></script>
         <script src="js/YoloBearTeam.js"></script>
         <script src="js/YoloBearGame.js"></script>
@@ -64,22 +65,31 @@
 </div>
 
       <div id="onoff">
-          <span ng-show="isUnconnectedToAnyone()"><img src="img/off.png" alt="Off" height=25 width=25></span>
-          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&&!dataReceiving"><img src="img/on.png" alt="On" height=25 width=25></span>
-          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&&dataReceiving"><img src="img/onf.png" alt="On" height=25 width=25></span>
+          <span ng-show="whoIsAdmin()!=id&&(isUnconnectedToAnyone()||!conns[whoIsAdmin()].open)"><img src="img/off.png" alt="Off" height=25 width=25></span>
+          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&&!dataReceiving&&conns[whoIsAdmin()].open"><img src="img/on.png" alt="On" height=25 width=25></span>
+          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&&dataReceiving&&conns[whoIsAdmin()].open"><img src="img/onf.png" alt="On" height=25 width=25></span>
           <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&&doingDataBroadcast"><img src="img/micro_on.png" alt="Broadcasting" height=25 width=25></span>
           <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&&!doingDataBroadcast"><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
       </div>
 
       <div id="ybpConnectDiv" hidden>
+          <div ng-show="peer.disconnected||peer.destroyed||!peer.id||peerError">
+            <span ng-show="!autoReconnectFailed">Connecting to server <span ng-show="connAttemptN>0">(attempt {{connAttemptN}}/{{PEERJS_MAX_RECONN_ATTEMPT}})</span></span>
+            <span ng-show=" autoReconnectFailed">
+               Failed to connect to server &nbsp;
+               <button ng-click="connAttemptN=0; autoReconnectFailed=false; manualConnect();">Try again</button>
+            </span>
+          </div>
+          <div ng-show="!peer.disconnected&&!peer.destroyed&&peer.id&&!peerError" class="form-inline form-group">
 <!--      Admin is {{whoIsAdmin()}}, {{whoIsAdmin2()}}<br><br>
       <div>Your id: {{id}}</div>
       <div ng-show="!isUnconnectedToAnyone()"><button id="ybpConnectContinueBtn">Continue</button> existing tournament</div>-->
-      Connect to peer: <input type="text" ng-model="rid" placeholder="Someone else's id">
-                       <button ng-click="connectOut(rid); rid=''; " id="ybpConnectConnectBtn">Connect</button>
+      Connect to peer: <input type="text" ng-model="rid" placeholder="Someone else's id" class="form-control">
+                       <button ng-click="connectOut(rid); rid=''; " id="ybpConnectConnectBtn" class="btn btn-primary" ng-disabled="connectOutId.hasOwnProperty(rid)">Connect</button>
+      </div><!-- end div !peer.disconnected -->
 
 
-      <div id="chat_area"><!-- ng-show="peers().length>0"> -->
+      <div id="chat_area" ng-show="peer.id"><!-- ng-show="peers().length>0"> -->
 <!--        <input type="text" ng-model="msg" placeholder="Enter message">-->
         <ul>
         <li>
@@ -87,19 +97,22 @@
         <span ng-show="id==whoIsAdmin()" >* </span>
         <span ng-show="id==whoIsAdmin2()">**</span>
         &nbsp; (me)
-        <button ng-click="copyToClipboard(id)">Copy</button>
+        <button ng-click="copyToClipboard(id)" class="btn">Copy</button>
     	<ul>
     	  <li ng-repeat="pm in peerMsgs(id)">{{pm.ts}}: {{pm.msg}}</li>
     	</ul>
         </li>
         <li ng-repeat="p in peers()">
-    	  {{p}}
+    	  <span class="isOpen{{conns[p].open}}">{{p}}</span>
           <span ng-show="p==whoIsAdmin()" >* </span>
           <span ng-show="p==whoIsAdmin2()">**</span>
           &nbsp; {{peerList(p)}} &nbsp;
-<!--    	  <button ng-click="send(p)" ng-disabled="!alive[p]">Send</button>-->
-    	  <button ng-click="assignAdmin1(p)" ng-disabled="id!=whoIsAdmin() || !alive[p]" ng-show="iAmAdmin()">&gt; A1</button>
-    	  <button ng-click="assignAdmin2(p)" ng-disabled="id!=whoIsAdmin() || p==whoIsAdmin2() || !alive[p]" ng-show="iAmAdmin()">&gt; A2</button>
+<!--    	  <button ng-click="send(p)" ng-disabled="!conns[p].open">Send</button>-->
+    	  <button ng-click="connectOut(p)" ng-show="!conns[p].open" class="btn btn-info" ng-disabled="connectOutId.hasOwnProperty(p)">Connect</button>
+    	  <button ng-click="deletePeer(p)" ng-show="!conns[p].open" class="btn btn-danger" ng-disabled="connectOutId.hasOwnProperty(p)">Delete</button>
+    	  <button ng-click="assignAdmin1(p)" ng-show="id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A1</button>
+    	  <button ng-click="assignAdmin2(p)" ng-show="p==whoIsAdmin2()&&id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A2</button>
+    	  <button ng-click="closePeer(p)" ng-show=" conns[p].open" class="btn btn-danger">Disconnect</button>
     	  <ul>
     	  <li ng-repeat="pm in peerMsgs(p)">{{pm.ts}}: {{pm.msg}}</li>
     	  </ul>
@@ -114,8 +127,8 @@
 
 
     <div id="TeamsDiv" hidden>
-        <div ng-show="iAmAdmin()">
-            <input type='text' ng-model="newTeam.name" placeholder="New team name" required><button ng-click="addTeam()" ng-disabled="!newTeam.name">Add</button>
+        <div ng-show="iAmAdmin()" class="form-inline form-group">
+            <input type='text' ng-model="newTeam.name" placeholder="New team name" required class="form-control"><button ng-click="addTeam()" ng-disabled="!newTeam.name" class="btn btn-primary">Add</button>
         </div>
         <div ng-show="ybt.teams.length==0">None</div>
         <table ng-show="ybt.teams.length>0" class="table">
@@ -138,12 +151,12 @@
     </div>
     
     <div id="PlayersDiv" hidden>
-        <div ng-show="iAmAdmin()">
-            <input type='text' ng-model="newPlayer.name" placeholder="New player name" required>
-            <select ng-model="newPlayer.team" ng-options="te.id as te.name for te in ybt.teams" required>
+        <div ng-show="iAmAdmin()" class="form-inline form-group">
+            <input type='text' ng-model="newPlayer.name" placeholder="New player name" required class="form-control">
+            <select ng-model="newPlayer.team" ng-options="te.id as te.name for te in ybt.teams" required class="form-control">
               <option value="" disabled selected>Team</option>
             </select>
-            <button ng-click="addPlayer()" ng-disabled="!newPlayer.name||!ybt.teamIdExists(newPlayer.team)">Add</button>
+            <button ng-click="addPlayer()" ng-disabled="!newPlayer.name||!ybt.teamIdExists(newPlayer.team)" class="btn btn-primary">Add</button>
         </div>
 
         Players<br>
@@ -167,20 +180,20 @@
     <div id="GamesStateDiv" hidden>
         <div class="row">
         <ul class="nav nav-pills nav-stacked">
-          <li><a id="GamesDone" class="btn btn-lg btn-primary" ng-click="showGamesState='Done'">Done<span class="badge">{{ybt.nGamesState('Done')}}</span></a></li>
-          <li><a id="GamesPlaying" class="btn btn-lg btn-success" ng-click="showGamesState='Playing'">Playing<span class="badge">{{ybt.nGamesState('Playing')}}</span></a></li>
           <li><a id="GamesWaiting" class="btn btn-lg btn-warning" ng-click="showGamesState='Waiting'">Waiting<span class="badge">{{ybt.nGamesState('Waiting')}}</span></a></li>
+          <li><a id="GamesPlaying" class="btn btn-lg btn-success" ng-click="showGamesState='Playing'">Playing<span class="badge">{{ybt.nGamesState('Playing')}}</span></a></li>
+          <li><a id="GamesDone" class="btn btn-lg btn-primary" ng-click="showGamesState='Done'">Done<span class="badge">{{ybt.nGamesState('Done')}}</span></a></li>
         </ul>
         </div>
     </div>
 
     <div id="GamesDiv" hidden>
         Games<br>
-        <div ng-show="iAmAdmin()&&showGamesState=='Waiting'">
+        <div ng-show="iAmAdmin()&&showGamesState=='Waiting'" class="form-inline form-group">
             New game<br>
-            <select ng-model="newGame.team1" ng-options="te.id as te.name for te in ybt.teams"></select> &nbsp;
-            <select ng-model="newGame.team2" ng-options="te.id as te.name for te in ybt.teams"></select> &nbsp;
-            <button ng-click="addGame()" ng-disabled="newGame.team1==newGame.team2||!ybt.teamIdExists(newGame.team1)||!ybt.teamIdExists(newGame.team2)">Add</button>
+            <select ng-model="newGame.team1" ng-options="te.id as te.name for te in ybt.teams" class="form-control"></select> &nbsp;
+            <select ng-model="newGame.team2" ng-options="te.id as te.name for te in ybt.teams" class="form-control"></select> &nbsp;
+            <button ng-click="addGame()" ng-disabled="newGame.team1==newGame.team2||!ybt.teamIdExists(newGame.team1)||!ybt.teamIdExists(newGame.team2)" class="btn btn-primary">Add</button>
             <br>
         </div>
 

@@ -6,26 +6,38 @@ function YoloBearPeer($scope) {
   $scope.msg='';
   $scope.id=null;
   $scope.admins={}; // associative array of timestamps, where the keys are the peer ids. This gives a sorted list of prioritization for being admin on the tournament
-  $scope.alive={};
 
-    $scope.peer = new Peer({key: PEERJS_KEY, host: PEERJS_HOST, port: PEERJS_PORT, path: PEERJS_PATH, debug: PEERJS_DEBUG});
-    $scope.peer.on('open', function(id){
-      $scope.$apply(function() {
-	$scope.id=id;
-	$scope.msgs[id]=[];
-	$scope.lists[id]=[];
-        $scope.admins[id]=moment().valueOf();
-      });
-    });  
-  
-    // Await connections from others
-    $scope.peer.on('connection', function(c) {
-        $scope.$apply(function() {
-            $scope.admins[c.peer]=moment().valueOf(); // prioritize by time of connection
-            $scope.broadcastListResponse();
-            $scope.connect(c);
-        });
-    });
+    $scope.connAttemptN=0;
+
+    $scope.peer = null;
+
+    autoReconnectId=null;
+    $scope.PEERJS_MAX_RECONN_ATTEMPT=PEERJS_MAX_RECONN_ATTEMPT;
+    $scope.autoReconnectFailed=false;
+    $scope.peerError=false;
+    $scope.autoReconnect=function() {
+       if(!autoReconnectId) {
+          if($scope.connAttemptN<PEERJS_MAX_RECONN_ATTEMPT) {
+            $scope.$apply(function() { $scope.connAttemptN+=1; });
+            autoReconnectId=setTimeout(function() {
+               autoReconnectId=null;
+               $scope.manualConnect();
+            }, 3000);
+          } else {
+             $scope.$apply(function() { $scope.autoReconnectFailed=true; });
+          }
+       }
+    };
+
+    $scope.manualConnect=function() {
+               if(!$scope.peer||$scope.peer.destroyed) {
+                  $scope = YoloBearPeerCore($scope);
+               } else {
+                  $scope.peer.reconnect();
+               }
+    };
+    $scope.manualConnect();
+
 
   $scope.isUnconnectedToAnyone=function() {
 	wia=$scope.whoIsAdmin();
@@ -75,13 +87,12 @@ function YoloBearPeer($scope) {
     });
     });
     $scope.conns[c.peer]=c;
-    $scope.alive[c.peer]=true;
   };
 
-  connectOutId={};
+  $scope.connectOutId={};
   $scope.connectOut=function(id) {
     // if already connected
-    if($scope.conns.hasOwnProperty(id)) {
+    if($scope.conns.hasOwnProperty(id)&&$scope.conns[id].open) {
         $scope.admins[id]=$scope.admins[$scope.whoIsAdmin()]-1;
         sendListRequest(id);
         sendDataRequest(id);
@@ -89,11 +100,11 @@ function YoloBearPeer($scope) {
     }
 
     // already pending request to connect
-    if(connectOutId.hasOwnProperty(id)) return;
-    connectOutId[id]=setTimeout(function() { updatePeerStatus(id); delete connectOutId[id]; console.log("connect out timeout"); }, 5000); // must connect within 5 seconds
+    if($scope.connectOutId.hasOwnProperty(id)) return;
+    $scope.connectOutId[id]=setTimeout(function() { updatePeerStatus(id); delete $scope.connectOutId[id]; console.log("connect out timeout"); }, 5000); // must connect within 5 seconds
     c=$scope.peer.connect(id);
     c.on('open', function() { $scope.$apply(function() {
-        if(connectOutId.hasOwnProperty(id)) { clearTimeout(connectOutId[id]); delete connectOutId[id]; }
+        if($scope.connectOutId.hasOwnProperty(id)) { clearTimeout($scope.connectOutId[id]); delete $scope.connectOutId[id]; }
 	$scope.connect(c);
         sendListRequest(id);
         sendDataRequest(id);
@@ -103,7 +114,6 @@ function YoloBearPeer($scope) {
   
 
   updatePeerStatus=function(id) {
-    $scope.alive[id]=false;
     delete $scope.admins[id];
     $scope.broadcastListResponse(); // only admins broadcast since only admins are listened to
   };
@@ -119,7 +129,7 @@ function YoloBearPeer($scope) {
   };
   $scope.broadcastListResponse = function() {
     if($scope.id==$scope.whoIsAdmin()||$scope.id==$scope.whoIsAdmin2()) {
-      $scope.peers().map(function(x) { if($scope.alive[x]) sendListResponse(x); });
+      $scope.peers().map(function(x) { if($scope.conns[x].open) sendListResponse(x); });
     }
   }; // broadcast my upcoming new connection before connecting
 
@@ -144,7 +154,7 @@ function YoloBearPeer($scope) {
   $scope.$on('requestDataBroadcast',function(event,ybt) {
     if($scope.id==$scope.whoIsAdmin()||$scope.id==$scope.whoIsAdmin2()) {
       $scope.doingDataBroadcast=true;
-      $scope.peers().map(function(x) { if($scope.alive[x]) {
+      $scope.peers().map(function(x) { if($scope.conns[x].open) {
         $scope.conns[x].send({type:"tournament",ybt:ybt});
       } });
       if(doingDataBroadcastId==null) doingDataBroadcastId=setTimeout(function() { $scope.$apply(function() { $scope.doingDataBroadcast=false; }); doingDataBroadcastId=null; }, 1000);
@@ -153,7 +163,7 @@ function YoloBearPeer($scope) {
 
   $scope.$on('requestDataBroadcast2',function(event,ybt,peerId) {
     if($scope.id==$scope.whoIsAdmin()||$scope.id==$scope.whoIsAdmin2()) {
-      if($scope.alive[peerId]) {
+      if($scope.conns[peerId].open) {
         $scope.conns[peerId].send({type:"tournament",ybt:ybt});
       }
     }
@@ -176,5 +186,14 @@ function YoloBearPeer($scope) {
       $scope.$parent.ybt=new YoloBearTournament();
     }
   });
+
+  $scope.closePeer=function(id) { $scope.conns[id].close(); };
+  $scope.deletePeer=function(id) {
+     if(!$scope.conns[id].open) {
+        delete $scope.conns[id];
+     } else {
+        alert("Please disconnect from peer before deleting the connection.");
+     }
+  };
 
 }
