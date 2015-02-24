@@ -101,7 +101,7 @@ function YoloBearPeer($scope) {
 
     // already pending request to connect
     if($scope.connectOutId.hasOwnProperty(id)) return;
-    $scope.connectOutId[id]=setTimeout(function() { updatePeerStatus(id); delete $scope.connectOutId[id]; console.log("connect out timeout"); }, 5000); // must connect within 5 seconds
+    $scope.connectOutId[id]=setTimeout(function() { updatePeerStatus(id); delete $scope.connectOutId[id]; alert("Connection to "+id+" timed out"); }, PEERJS_TIMEOUT); // must connect within 5 seconds
     c=$scope.peer.connect(id);
     c.on('open', function() { $scope.$apply(function() {
         if($scope.connectOutId.hasOwnProperty(id)) { clearTimeout($scope.connectOutId[id]); delete $scope.connectOutId[id]; }

@@ -1,5 +1,5 @@
+** annoying when peer has bad connection... should show pending connection state instead of jumping to menu
+** also annoying to have to copy paste id of peer using another tools such as irc or gmail... should have server automatically give all peer ids
 * got to make my own heartbeat from admin2 to admin1
 ** because when admin1 disconnected from wifi on tablet, no disconnect event was fired for admin2 in browser
-* need autoreconnect to signalling server upon regain of wifi
-* connect tab disabled/enabled buttons to have different colors
-* connect tab: disable connect button if supplied id is empty
+
