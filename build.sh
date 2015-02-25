@@ -5,7 +5,7 @@
 set -e
 
 version=0.0.0
-output="~/Yolobear_${version}_arm.apk"
+output=~/Yolobear_${version}_arm.apk
 
 rm -f $output
 python ~/crosswalk-10.39.235.15/make_apk.py \
