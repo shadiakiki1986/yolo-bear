@@ -1,3 +1,5 @@
 td { white-space: nowrap; }
 #onoff { position:fixed; top:0; right:120px; }
+.isOpentrue { ; }
 .isOpenfalse { text-decoration: line-through; }
+.isOpen { font-style: italic; } /* unknown open or not */

@@ -1,4 +1,5 @@
   $(document).ready(function() {
+
     // Show browser version
     $('#browsers').text(navigator.userAgent);
 

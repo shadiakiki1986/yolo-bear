@@ -9,6 +9,10 @@ YoloBearPeerCore=function($scope) {
 	$scope.msgs[id]=[];
 	$scope.lists[id]=[];
         $scope.admins[id]=moment().valueOf();
+        $scope.nicks[id]=$scope.nickName; // my own nickname
+
+        // get list of peers on server
+	$scope.listAllPeers();
       });
     });  
   
@@ -16,6 +20,7 @@ YoloBearPeerCore=function($scope) {
     $scope.peer.on('connection', function(c) {
         $scope.$apply(function() {
             $scope.admins[c.peer]=moment().valueOf(); // prioritize by time of connection
+            $scope.nicks[c.peer]=c.label;
             $scope.broadcastListResponse();
             $scope.connect(c);
         });
@@ -27,7 +32,18 @@ YoloBearPeerCore=function($scope) {
       switch(err.type) {
         case "server-error":
         case "network": $scope.autoReconnect(); break;
-        default: alert("Error: "+err.type);
+        case "peer-unavailable":
+          $scope.peerError=false; // not really a server error
+          id=err.message.split(" ").pop();
+           if($scope.connectOutId.hasOwnProperty(id)) {
+             clearTimeout($scope.connectOutId[id]);
+$scope.$apply(function() {
+             delete $scope.connectOutId[id];
+             $scope.conns[id]={open:false};
+});
+           }
+           break;
+        default: alert("Server error: "+err.type);
       };
     });
 

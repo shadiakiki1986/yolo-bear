@@ -2,11 +2,18 @@ I'm tring to follow Semantic Versioning 2.0.0
 http://semver.org/
 
 =V0.0.0=
+2015-02-25
+* added peer discovery to server and clients
+* added nickname + can update nicknames
+** still testing
+
 2015-02-24
 * re-tested on tablet
 ** annoying when peer has bad connection... should show pending connection state instead of jumping to menu
 ** also annoying to have to copy paste id of peer using another tools such as irc or gmail... should have server automatically give all peer ids
+** will not release
 * added published material on google play (screenshots)
+** but didn't release APK yet
 
 2015-02-23
 * added some more bootstrap classes to the admin controls

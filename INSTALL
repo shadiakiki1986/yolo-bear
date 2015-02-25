@@ -7,7 +7,7 @@ References
 
 Server:
 * sudo npm install peer -g
-* peerjs --port 9000 --key peerjs --path /yolo-bear --debug
+* peerjs --port 9000 --key peerjs --path /yolo-bear --debug --allow_discovery
 ** could use `openssl rand -base64 18` to generate random string for key
 
 Client

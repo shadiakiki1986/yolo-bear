@@ -1,8 +1,12 @@
 function YoloBearPeer($scope) {
   
+  $scope.nickName = prompt("Nickname", "");
+  $scope.nickName2=$scope.nickName;
+
   $scope.conns={};
   $scope.msgs={};
   $scope.lists={};
+  $scope.nicks={};
   $scope.msg='';
   $scope.id=null;
   $scope.admins={}; // associative array of timestamps, where the keys are the peer ids. This gives a sorted list of prioritization for being admin on the tournament
@@ -62,13 +66,19 @@ function YoloBearPeer($scope) {
                     if(!($scope.id==wia&&wia2=="")&&!(c.peer==wia)) break; // only listen to admins
                     $scope.lists[c.peer]=Object.keys(data.admins);
                     $scope.admins=data.admins;
+console.log("listResponse",data.nicks);
+                    $scope.nicks=data.nicks;
                     // update who I think the admins are
                     wia=$scope.whoIsAdmin();
                     wia2=$scope.whoIsAdmin2();
-                    if(wia !=$scope.id && !$scope.conns.hasOwnProperty(wia )) {
-                        console.log("Need to connect to ",wia ); $scope.connectOut(wia );
+                    if(wia !=$scope.id && (!$scope.conns.hasOwnProperty(wia ) || !$scope.conns[wia].open ) ) {
+                        console.log("Need to connect to ",wia );
+                        $scope.connectOut(wia );
                     } else {
-                        if(wia2!=$scope.id && !$scope.conns.hasOwnProperty(wia2)) { console.log("Need to connect to ",wia2); $scope.connectOut(wia2); }
+                        if(wia2!=$scope.id && (!$scope.conns.hasOwnProperty(wia2) || !$scope.conns[wia2].open )) {
+                           console.log("Need to connect to ",wia2);
+                           $scope.connectOut(wia2);
+                        }
                     }
                     break;
                 case "tournament":
@@ -84,37 +94,48 @@ function YoloBearPeer($scope) {
     }); });
     c.on('close', function(err){ $scope.$apply(function() {
         updatePeerStatus(c.peer);
-    });
-    });
+    }); });
     $scope.conns[c.peer]=c;
   };
 
   $scope.connectOutId={};
   $scope.connectOut=function(id) {
-    // if already connected
-    if($scope.conns.hasOwnProperty(id)&&$scope.conns[id].open) {
-        $scope.admins[id]=$scope.admins[$scope.whoIsAdmin()]-1;
-        sendListRequest(id);
-        sendDataRequest(id);
-        return;
-    }
-
     // already pending request to connect
     if($scope.connectOutId.hasOwnProperty(id)) return;
-    $scope.connectOutId[id]=setTimeout(function() { updatePeerStatus(id); delete $scope.connectOutId[id]; alert("Connection to "+id+" timed out"); }, PEERJS_TIMEOUT); // must connect within 5 seconds
-    c=$scope.peer.connect(id);
+
+    // if already connected
+    if($scope.conns.hasOwnProperty(id)&&$scope.conns[id].open) return;
+
+    // cancel if cannot connect within X seconds
+    $scope.connectOutId[id]=setTimeout(function() {
+        updatePeerStatus(id);
+        delete $scope.connectOutId[id];
+        alert("Connection to "+id+" timed out");
+      }, PEERJS_TIMEOUT); 
+
+    // connect
+    c=$scope.peer.connect(id,{label:($scope.nickName?$scope.nickName:id)});
     c.on('open', function() { $scope.$apply(function() {
-        if($scope.connectOutId.hasOwnProperty(id)) { clearTimeout($scope.connectOutId[id]); delete $scope.connectOutId[id]; }
+        if($scope.connectOutId.hasOwnProperty(id)) {
+           clearTimeout($scope.connectOutId[id]);
+           delete $scope.connectOutId[id];
+        }
 	$scope.connect(c);
+        // give up admin so as to accept list response
+        $scope.admins[id]=$scope.admins[$scope.whoIsAdmin()]-1;
+        // request lists and data
         sendListRequest(id);
         sendDataRequest(id);
     }); });
-    c.on('error', function(err){ alert("Failed to connect to "+c.peer); });
+    c.on('error', function(err){
+      alert("Failed to connect to "+c.peer);
+    });
   };
   
 
   updatePeerStatus=function(id) {
     delete $scope.admins[id];
+    $scope.conns[id]={};
     $scope.broadcastListResponse(); // only admins broadcast since only admins are listened to
   };
 
@@ -125,7 +146,7 @@ function YoloBearPeer($scope) {
   };
 
   sendListResponse=function(id) {
-    $scope.conns[id].send({type:"listResponse",admins:$scope.admins});
+    $scope.conns[id].send({type:"listResponse",admins:$scope.admins,nicks:$scope.nicks});
   };
   $scope.broadcastListResponse = function() {
     if($scope.id==$scope.whoIsAdmin()||$scope.id==$scope.whoIsAdmin2()) {
@@ -145,7 +166,11 @@ function YoloBearPeer($scope) {
 
   $scope.peers=function() { return Object.keys($scope.conns); };
   $scope.peerMsgs=function(id) { return $scope.msgs[id]; };
-  $scope.peerList=function(id) { if($scope.peers()<=1) return ""; else return "("+$scope.lists[id].filter(function(x) { return $scope.peers().indexOf(x)==-1 && x!=$scope.id; }).join()+")"; };
+  $scope.peerList=function(id) {
+    if($scope.peers()<=1) return "";
+    if(!$scope.lists.hasOwnProperty(id)) return "";
+    return "("+$scope.lists[id].filter(function(x) { return $scope.peers().indexOf(x)==-1 && x!=$scope.id; }).join()+")";
+  };
   $scope.whoIsAdmin=function() { return Object.keys($scope.admins).filter(function(x) { return $scope.admins[x]==Object.values($scope.admins).min(); })[0]; };
   $scope.whoIsAdmin2= function() { return (Object.keys($scope.admins).length<=1?"":Object.keys($scope.admins).filter(function(x) { return $scope.admins[x]==Object.values($scope.admins).diff(Object.values($scope.admins).min()).min(); })[0]); };
 
@@ -187,13 +212,40 @@ function YoloBearPeer($scope) {
     }
   });
 
-  $scope.closePeer=function(id) { $scope.conns[id].close(); };
+  $scope.closePeer=function(id) {
+    $scope.conns[id].close();
+    $scope.conns[id]={};
+  };
+
   $scope.deletePeer=function(id) {
      if(!$scope.conns[id].open) {
         delete $scope.conns[id];
      } else {
         alert("Please disconnect from peer before deleting the connection.");
      }
+  };
+
+  $scope.listAllPeers=function() {
+        // get list of peers on server
+	$scope.peer.listAllPeers(function(lap) {
+           lap
+             .filter(function(x) { return x!=$scope.id; })
+             .map(function(x) { $scope.$apply(function() {
+                if(!$scope.conns.hasOwnProperty(x)) $scope.conns[x]={};
+             }); });
+	});
+  };
+
+  $scope.updateNickName=function() {
+    $scope.nickName=$scope.nickName2;
+    wia=$scope.whoIsAdmin();
+    if(wia==$scope.id) {
+       $scope.nicks[wia]=$scope.nickName;
+       $scope.broadcastListResponse();
+    } else {
+       $scope.closePeer($scope.conns[wia]);
+       $scope.connectOut($scope.conns[wia]);
+    }
   };
 
 }

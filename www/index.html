@@ -73,6 +73,11 @@
       </div>
 
       <div id="ybpConnectDiv" hidden>
+          <div class="form-inline form-group">
+             Nickname: <input type="text" ng-model="nickName2" placeholder="Nickname" class="form-control">
+                       <button ng-click="updateNickName()" class="btn btn-info" ng-disabled="nickName==nickName2">Update</button>
+          </div>
+
           <div ng-show="peer.disconnected||peer.destroyed||!peer.id||peerError">
             <span ng-show="!autoReconnectFailed">Connecting to server <span ng-show="connAttemptN>0">(attempt {{connAttemptN}}/{{PEERJS_MAX_RECONN_ATTEMPT}})</span></span>
             <span ng-show=" autoReconnectFailed">
@@ -84,8 +89,11 @@
 <!--      Admin is {{whoIsAdmin()}}, {{whoIsAdmin2()}}<br><br>
       <div>Your id: {{id}}</div>
       <div ng-show="!isUnconnectedToAnyone()"><button id="ybpConnectContinueBtn">Continue</button> existing tournament</div>-->
+
       Connect to peer: <input type="text" ng-model="rid" placeholder="Someone else's id" class="form-control">
                        <button ng-click="connectOut(rid); rid=''; " id="ybpConnectConnectBtn" class="btn btn-primary" ng-disabled="connectOutId.hasOwnProperty(rid)">Connect</button>
+                       <button ng-click="listAllPeers()" class="btn btn-info">Refresh</button>
+
       </div><!-- end div !peer.disconnected -->
 
 
@@ -94,8 +102,8 @@
         <ul>
         <li>
     	{{id}}
-        <span ng-show="id==whoIsAdmin()" >* </span>
-        <span ng-show="id==whoIsAdmin2()">**</span>
+        <span ng-show="id==whoIsAdmin()" ><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
+        <span ng-show="id==whoIsAdmin2()"><img src="img/micro_off.png" alt="Admin" height=25 width=25 style="opacity: 0.4;"></span>
         &nbsp; (me)
         <button ng-click="copyToClipboard(id)" class="btn">Copy</button>
     	<ul>
@@ -103,9 +111,19 @@
     	</ul>
         </li>
         <li ng-repeat="p in peers()">
-    	  <span class="isOpen{{conns[p].open}}">{{p}}</span>
-          <span ng-show="p==whoIsAdmin()" >* </span>
-          <span ng-show="p==whoIsAdmin2()">**</span>
+    	  <span class="isOpen{{conns[p].open}}" ng-switch="nicks.hasOwnProperty(p)">
+              <span ng-switch-when="true">
+                <span ng-switch="nicks[p]==nickName">
+                  <span ng-switch-when="true">{{p}}</span>
+                  <span ng-switch-default>{{nicks[p]}}</span>
+                </span>
+              </span>
+              <span ng-switch-default>
+                 {{p}}
+              </span>
+          </span>
+          <span ng-show="p==whoIsAdmin()" ><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
+          <span ng-show="p==whoIsAdmin2()"><img src="img/micro_off.png" alt="Admin" height=25 width=25 style="opacity: 0.4;"></span>
           &nbsp; {{peerList(p)}} &nbsp;
 <!--    	  <button ng-click="send(p)" ng-disabled="!conns[p].open">Send</button>-->
     	  <button ng-click="connectOut(p)" ng-show="!conns[p].open" class="btn btn-info" ng-disabled="connectOutId.hasOwnProperty(p)">Connect</button>
