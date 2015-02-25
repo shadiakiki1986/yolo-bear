@@ -1,5 +1,4 @@
-** annoying when peer has bad connection... should show pending connection state instead of jumping to menu
-** also annoying to have to copy paste id of peer using another tools such as irc or gmail... should have server automatically give all peer ids
+* when nickname is empty, the ID of the server is shown on the server's peer list instead of the ID of the connector peer
 * got to make my own heartbeat from admin2 to admin1
 ** because when admin1 disconnected from wifi on tablet, no disconnect event was fired for admin2 in browser
 
