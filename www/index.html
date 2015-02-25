@@ -26,11 +26,10 @@
 
 </head> 
  
-<body class="container"> 
+<body class="container" hidden> 
 
         <div class="row">
             <div class="muted pull-right"><img src="img/logo.png" alt="logo" width=40 height=40></div>
-            <div hidden class="pull-left" id="backBtnDiv"><button class="btn" id="backBtn">Back</button></div>
             <div hidden class="pull-left" id="backBtn2Div"><button class="btn" id="backBtn2">Back</button></div>
             <div hidden class="pull-left" id="backBtn3Div"><button class="btn" id="backBtn3">Back</button></div>
         </div>
@@ -38,7 +37,7 @@
 <div ng-controller="Controller1" id="Controller1">
 
 
-<div id="tournamentDiv" hidden>
+<div id="tournamentDiv">
 <div class="row">
 <ul class="nav nav-pills nav-stacked">
   <li><a id="Chat" class="btn btn-lg btn-info">Connect</a></li>
@@ -51,19 +50,6 @@
 
 
     <div ng-controller="YoloBearPeer">
-<div class="jumbotron" id="decideFollowCreate">
-<!--   <h3>With Yolo Bear you can create a tournament, manage it, and broadcast it to other people's devices, or you can sit back and watch a broadcast of an existing tournament.</h3>-->
-   <a class="btn btn-lg btn-primary" id="decideFollowBtn">Follow</a> an existing tournament
-   <br>
-   <br>
-   <a class="btn btn-lg btn-info" id="decideCreateBtn" ng-click="decideBroadcast()">Broadcast</a> a new tournament
-   <span ng-show="!isUnconnectedToAnyone()">
-   <br>
-   <br>
-   <a class="btn btn-lg btn-default" id="decideContinueBtn">Continue</a> the current tournament
-   </span>
-</div>
-
       <div id="onoff">
           <span ng-show="whoIsAdmin()!=id&&(isUnconnectedToAnyone()||!conns[whoIsAdmin()].open)"><img src="img/off.png" alt="Off" height=25 width=25></span>
           <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&&!dataReceiving&&conns[whoIsAdmin()].open"><img src="img/on.png" alt="On" height=25 width=25></span>
@@ -73,11 +59,6 @@
       </div>
 
       <div id="ybpConnectDiv" hidden>
-          <div class="form-inline form-group">
-             Nickname: <input type="text" ng-model="nickName2" placeholder="Nickname" class="form-control">
-                       <button ng-click="updateNickName()" class="btn btn-info" ng-disabled="nickName==nickName2">Update</button>
-          </div>
-
           <div ng-show="peer.disconnected||peer.destroyed||!peer.id||peerError">
             <span ng-show="!autoReconnectFailed">Connecting to server <span ng-show="connAttemptN>0">(attempt {{connAttemptN}}/{{PEERJS_MAX_RECONN_ATTEMPT}})</span></span>
             <span ng-show=" autoReconnectFailed">
@@ -89,9 +70,9 @@
 <!--      Admin is {{whoIsAdmin()}}, {{whoIsAdmin2()}}<br><br>
       <div>Your id: {{id}}</div>
       <div ng-show="!isUnconnectedToAnyone()"><button id="ybpConnectContinueBtn">Continue</button> existing tournament</div>-->
-
+<!--
       Connect to peer: <input type="text" ng-model="rid" placeholder="Someone else's id" class="form-control">
-                       <button ng-click="connectOut(rid); rid=''; " id="ybpConnectConnectBtn" class="btn btn-primary" ng-disabled="connectOutId.hasOwnProperty(rid)">Connect</button>
+                       <button ng-click="connectOut(rid); rid=''; " id="ybpConnectConnectBtn" class="btn btn-primary" ng-disabled="connectOutId.hasOwnProperty(rid)">Connect</button>-->
                        <button ng-click="listAllPeers()" class="btn btn-info">Refresh</button>
 
       </div><!-- end div !peer.disconnected -->
@@ -101,11 +82,13 @@
 <!--        <input type="text" ng-model="msg" placeholder="Enter message">-->
         <ul>
         <li>
-    	{{id}}
+        <input type="text" ng-model="nickName" placeholder="Nickname" size=10>
+        <button ng-click="updateNickName()" class="btn btn-info" ng-disabled="nickName==nickName2">Update nickname</button>
+        <br>
         <span ng-show="id==whoIsAdmin()" ><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
         <span ng-show="id==whoIsAdmin2()"><img src="img/micro_off.png" alt="Admin" height=25 width=25 style="opacity: 0.4;"></span>
-        &nbsp; (me)
-        <button ng-click="copyToClipboard(id)" class="btn">Copy</button>
+        &nbsp; ({{id}}, me)
+<!--    <button ng-click="copyToClipboard(id)" class="btn">Copy</button>-->
     	<ul>
     	  <li ng-repeat="pm in peerMsgs(id)">{{pm.ts}}: {{pm.msg}}</li>
     	</ul>
@@ -148,7 +131,7 @@
         <div ng-show="iAmAdmin()" class="form-inline form-group">
             <input type='text' ng-model="newTeam.name" placeholder="New team name" required class="form-control"><button ng-click="addTeam()" ng-disabled="!newTeam.name" class="btn btn-primary">Add</button>
         </div>
-        <div ng-show="ybt.teams.length==0">None</div>
+        <div ng-show="ybt.teams.length==0">No teams added yet</div>
         <table ng-show="ybt.teams.length>0" class="table">
         <thead><tr><th>Team</th><th>Won</th><th>Lost</th><th>Tie</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th><th>Players</th><th></th></tr></thead>
         <tbody>
@@ -178,7 +161,7 @@
         </div>
 
         Players<br>
-        <span ng-show="ybt.players.length==0">None</span>
+        <span ng-show="ybt.players.length==0">No players added yet</span>
         <table ng-show="ybt.players.length>0" class="table">
         <thead><tr><th>Team</th><th>Player</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th><th></th></tr></thead>
         <tbody>
@@ -216,7 +199,7 @@
         </div>
 
 
-        <div ng-show="ybt.gamesByState(showGamesState).length==0">{{showGamesState}}: None</div>
+        <div ng-show="ybt.gamesByState(showGamesState).length==0">{{showGamesState}}: No games added yet</div>
         <div ng-repeat="ga in ybt.gamesByState(showGamesState)">
         {{ga.team1().name}} ({{ga.teamStat(ga.team1().id,'Score')}})
         x

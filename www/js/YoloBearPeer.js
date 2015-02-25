@@ -1,7 +1,7 @@
 function YoloBearPeer($scope) {
   
-  $scope.nickName = prompt("Nickname", "");
-  $scope.nickName2=$scope.nickName;
+  $scope.nickName = null;
+  $scope.nickName2= null;
 
   $scope.conns={};
   $scope.msgs={};
@@ -237,15 +237,21 @@ console.log("listResponse",data.nicks);
   };
 
   $scope.updateNickName=function() {
-    $scope.nickName=$scope.nickName2;
+    $scope.nickName2=$scope.nickName;
+    if($scope.isUnconnectedToAnyone()) return;
     wia=$scope.whoIsAdmin();
     if(wia==$scope.id) {
        $scope.nicks[wia]=$scope.nickName;
        $scope.broadcastListResponse();
     } else {
-       $scope.closePeer($scope.conns[wia]);
-       $scope.connectOut($scope.conns[wia]);
+       $scope.closePeer(wia);
+       $scope.connectOut(wia);
     }
   };
+
+  angular.element(document).ready(function () {
+    $scope.nickName = prompt("Nickname", "");
+    $scope.nickName2=$scope.nickName;
+  });
 
 }

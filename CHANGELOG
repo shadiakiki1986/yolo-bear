@@ -5,7 +5,8 @@ http://semver.org/
 2015-02-25
 * added peer discovery to server and clients
 * added nickname + can update nicknames
-** still testing
+* removed main menu
+* simplified "Connect" tab
 
 2015-02-24
 * re-tested on tablet

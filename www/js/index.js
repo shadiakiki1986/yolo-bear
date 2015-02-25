@@ -2,15 +2,7 @@
 
     // Show browser version
     $('#browsers').text(navigator.userAgent);
-
-    $('#decideFollowBtn,#decideCreateBtn,#decideContinueBtn').click(function() {
-       $('#decideFollowCreate').hide();
-       $('#backBtnDiv').show();
-    });
-
-    $('#decideFollowBtn').click(function() { $('#ybpConnectDiv').show(); });
-    $('#decideCreateBtn').click(function() { $('#tournamentDiv').show(); });
-    $('#decideContinueBtn').click(function() { $('#tournamentDiv').show(); });
+    $('body').show();
 
     $('#ybpConnectConnectBtn').click(function() {
          $('#ybpConnectDiv').hide();
@@ -18,11 +10,9 @@
     });
     $('#Chat,#Teams,#Players,#Games,#backBtn').click(function() {
        $('#tournamentDiv').hide();
-       $('#backBtnDiv').hide();
     });
     $('#backBtn').click(function() {
        $('#ybpConnectDiv').hide();
-       $('#decideFollowCreate').show();
     });
     $('#Chat,#Teams,#Players,#Games').click(function() {
        $('#backBtn2Div').show();
@@ -32,7 +22,6 @@
     });
     $('#backBtn2').click(function() {
        $('#tournamentDiv').show();
-       $('#backBtnDiv').show();
        $('#ybpConnectDiv').hide();
        $('#TeamsDiv').hide();
        $('#PlayersDiv').hide();
