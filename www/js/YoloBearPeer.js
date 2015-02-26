@@ -63,10 +63,12 @@ function YoloBearPeer($scope) {
                 case "listRequest": sendListResponse(c.peer); break;
                 case "dataRequest": $scope.$emit("gotDataRequest",c.peer); break;
 		case "listResponse":
-                    if(!($scope.id==wia&&wia2=="")&&!(c.peer==wia)) break; // only listen to admins
+                    if(!($scope.id==wia&&wia2=="") && // listen to anybody if unconnected
+                       !(c.peer==wia )&&  // listen to admin1
+                       !(c.peer==wia2 &&!($scope.conns.hasOwnProperty(wia)&&$scope.conns[wia].open))) // listen to admin2 if admin1 is dead
+                          break;
                     $scope.lists[c.peer]=Object.keys(data.admins);
                     $scope.admins=data.admins;
-console.log("listResponse",data.nicks);
                     $scope.nicks=data.nicks;
                     // update who I think the admins are
                     wia=$scope.whoIsAdmin();
@@ -108,13 +110,15 @@ console.log("listResponse",data.nicks);
 
     // cancel if cannot connect within X seconds
     $scope.connectOutId[id]=setTimeout(function() {
+        $scope.$apply(function() {
         updatePeerStatus(id);
+        $scope.conns[id]={open:false};
         delete $scope.connectOutId[id];
         alert("Connection to "+id+" timed out");
-      }, PEERJS_TIMEOUT); 
+      })}, PEERJS_TIMEOUT); 
 
     // connect
-    c=$scope.peer.connect(id,{label:($scope.nickName?$scope.nickName:id)});
+    c=$scope.peer.connect(id,{metadata:{nick:$scope.nickName}});
     c.on('open', function() { $scope.$apply(function() {
         if($scope.connectOutId.hasOwnProperty(id)) {
            clearTimeout($scope.connectOutId[id]);
@@ -217,23 +221,28 @@ console.log("listResponse",data.nicks);
     $scope.conns[id]={};
   };
 
-  $scope.deletePeer=function(id) {
-     if(!$scope.conns[id].open) {
-        delete $scope.conns[id];
-     } else {
-        alert("Please disconnect from peer before deleting the connection.");
-     }
-  };
-
+  $scope.listAllPeersStatus=false;
   $scope.listAllPeers=function() {
-        // get list of peers on server
-	$scope.peer.listAllPeers(function(lap) {
-           lap
-             .filter(function(x) { return x!=$scope.id; })
-             .map(function(x) { $scope.$apply(function() {
-                if(!$scope.conns.hasOwnProperty(x)) $scope.conns[x]={};
-             }); });
-	});
+    $scope.listAllPeersStatus=true;
+    // cleaning up entries before getting updated list from server
+    Object.keys($scope.conns).map(function(x) {
+      if(Object.keys($scope.conns[x]).length==0) {
+           delete $scope.conns[x];
+      } else if(Object.keys($scope.conns[x]).length==1 & Object.keys($scope.conns[x])[0]=="open" & !$scope.conns[x].open) {
+          delete $scope.conns[x];
+      }
+    });
+    // get list of peers on server
+    $scope.peer.listAllPeers(function(lap) {
+      lap
+       .filter(function(x) { return x!=$scope.id; })
+       .map(function(x) { $scope.$apply(function() {
+          if(!$scope.conns.hasOwnProperty(x)) $scope.conns[x]={};
+       }); });
+      $scope.$apply(function() { $scope.listAllPeersStatus=false; });
+    });
+    // in case this takes too long
+    setTimeout(function() { $scope.$apply(function() { $scope.listAllPeersStatus=false; }); }, PEERJS_TIMEOUT);
   };
 
   $scope.updateNickName=function() {
@@ -248,10 +257,5 @@ console.log("listResponse",data.nicks);
        $scope.connectOut(wia);
     }
   };
-
-  angular.element(document).ready(function () {
-    $scope.nickName = prompt("Nickname", "");
-    $scope.nickName2=$scope.nickName;
-  });
 
 }

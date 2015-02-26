@@ -1,4 +1,3 @@
-* when nickname is empty, the ID of the server is shown on the server's peer list instead of the ID of the connector peer
 * got to make my own heartbeat from admin2 to admin1
 ** because when admin1 disconnected from wifi on tablet, no disconnect event was fired for admin2 in browser
-
+* disconnect button causes root scope in progress error in angular

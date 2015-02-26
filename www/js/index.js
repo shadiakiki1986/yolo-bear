@@ -2,7 +2,6 @@
 
     // Show browser version
     $('#browsers').text(navigator.userAgent);
-    $('body').show();
 
     $('#ybpConnectConnectBtn').click(function() {
          $('#ybpConnectDiv').hide();

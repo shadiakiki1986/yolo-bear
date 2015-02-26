@@ -2,6 +2,16 @@ I'm tring to follow Semantic Versioning 2.0.0
 http://semver.org/
 
 =V0.0.0=
+2015-02-26
+* when nickname is empty, the ID of the server is shown on the server's peer list instead of the ID of the connector peer
+* showing IDs even if nick is given
+* make table instead of li
+* Connect -> "+", disconnect -> "x", Me -> glyph
+* removed delete peer since the refresh button autocleans the list
+* no more prompt for nickname
+* connected peers are in bold
+* now i think this is ready to roll to the store
+
 2015-02-25
 * added peer discovery to server and clients
 * added nickname + can update nicknames

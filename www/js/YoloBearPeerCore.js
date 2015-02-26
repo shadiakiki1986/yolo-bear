@@ -20,7 +20,7 @@ YoloBearPeerCore=function($scope) {
     $scope.peer.on('connection', function(c) {
         $scope.$apply(function() {
             $scope.admins[c.peer]=moment().valueOf(); // prioritize by time of connection
-            $scope.nicks[c.peer]=c.label;
+            $scope.nicks[c.peer]=c.metadata.nick;
             $scope.broadcastListResponse();
             $scope.connect(c);
         });
@@ -37,10 +37,10 @@ YoloBearPeerCore=function($scope) {
           id=err.message.split(" ").pop();
            if($scope.connectOutId.hasOwnProperty(id)) {
              clearTimeout($scope.connectOutId[id]);
-$scope.$apply(function() {
-             delete $scope.connectOutId[id];
-             $scope.conns[id]={open:false};
-});
+             $scope.$apply(function() {
+               delete $scope.connectOutId[id];
+               $scope.conns[id]={open:false};
+             });
            }
            break;
         default: alert("Server error: "+err.type);
