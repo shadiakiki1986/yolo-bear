@@ -78,7 +78,7 @@ this.nGamesState=function(st) {
        alert("Please delete the players on this team before deleting the team.");
     } else {
        if(this.games.filter(function(x) { return (x.team1Id==tid||x.team2Id==tid); }).length>0) {
-          alert("Please delete the games played by this teams before deleting the team");
+          alert("Please delete the games played by this team before deleting the team");
        } else {
           this.teams=this.teams.filter(function(x) { return (x.id!=tid); });
        }
