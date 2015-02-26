@@ -43,7 +43,7 @@
         <div id="tournamentDiv">
         <div class="row">
         <ul class="nav nav-pills nav-stacked">
-          <li><a id="Chat" class="btn btn-lg btn-info">Connect<span class="badge">{{peers().length}}</span></a></li>
+          <li><a id="Chat" class="btn btn-lg btn-info" ng-click="listAllPeers()">Connect<span class="badge">{{peers().length}}</span></a></li>
           <li><a id="Teams" class="btn btn-lg">Teams<span class="badge">{{ybt.teams.length}}</span></a></li>
           <li><a id="Players" class="btn btn-lg">Players<span class="badge">{{ybt.players.length}}</span></a></li>
           <li><a id="Games" class="btn btn-lg btn-primary">Games<span class="badge">{{ybt.nGamesState('Done')}} / {{ybt.games.length}}</span></a></li>
@@ -121,10 +121,10 @@
           &nbsp; {{peerList(p)}} &nbsp;
           </td>-->
           <td>
-             <button ng-click="connectOut(p)" ng-show="!conns[p].open" class="btn btn-info" ng-disabled="connectOutId.hasOwnProperty(p)">+</button>
+             <button ng-click="connectOut(p)" ng-show="!conns[p].open" class="btn btn-info" ng-disabled="connectOutId.hasOwnProperty(p)||(conns[p].hasOwnProperty('open')&&!conns[p].open)">+</button>
              <button ng-click="closePeer(p)" ng-show=" conns[p].open" class="btn btn-warning">x</button>
              <button ng-click="assignAdmin1(p)" ng-show="id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A1</button>
-             <button ng-click="assignAdmin2(p)" ng-show="p==whoIsAdmin2()&&id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A2</button>
+             <button ng-click="assignAdmin2(p)" ng-show="p!=whoIsAdmin2()&&id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A2</button>
           </td>
 <!--    	  <ul>
     	  <li ng-repeat="pm in peerMsgs(p)">{{pm.ts}}: {{pm.msg}}</li>
@@ -145,7 +145,7 @@
         </div>
         <div ng-show="ybt.teams.length==0">No teams added yet</div>
         <table ng-show="ybt.teams.length>0" class="table">
-        <thead><tr><th>Team</th><th>Won</th><th>Lost</th><th>Tie</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th><th>Players</th><th></th></tr></thead>
+        <thead><tr><th>Team</th><th>Won</th><th>Lost</th><th>Tie</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th><th></th><th>Players</th></tr></thead>
         <tbody>
             <tr ng-repeat="te in ybt.teams">
               <td>{{te.name}}</td>
@@ -155,8 +155,8 @@
               <td ng-repeat="sn in ybt.statNames">
                  {{te.gamesStat(sn)}}
               </td>
-              <td>{{te.playersNames()}}</td>
               <td><button ng-show="iAmAdmin()" ng-click="delTeam(te.id)" class="btn btn-danger">Del</button></td>
+              <td>{{te.playersNames()}}</td>
             </tr>
         </tbody>
         </table>
@@ -212,6 +212,7 @@
 
 
         <div ng-show="ybt.gamesByState(showGamesState).length==0">{{showGamesState}}: No games added yet</div>
+
         <div ng-repeat="ga in ybt.gamesByState(showGamesState)">
         {{ga.team1().name}} ({{ga.teamStat(ga.team1().id,'Score')}})
         x

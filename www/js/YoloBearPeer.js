@@ -114,7 +114,6 @@ function YoloBearPeer($scope) {
         updatePeerStatus(id);
         $scope.conns[id]={open:false};
         delete $scope.connectOutId[id];
-        alert("Connection to "+id+" timed out");
       })}, PEERJS_TIMEOUT); 
 
     // connect
@@ -223,6 +222,8 @@ function YoloBearPeer($scope) {
 
   $scope.listAllPeersStatus=false;
   $scope.listAllPeers=function() {
+    if($scope.peer.disconnected||$scope.peer.destroyed||!$scope.peer.id||$scope.peerError) return; // do nothing
+
     $scope.listAllPeersStatus=true;
     // cleaning up entries before getting updated list from server
     Object.keys($scope.conns).map(function(x) {
