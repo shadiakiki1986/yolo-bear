@@ -2,7 +2,7 @@
 * This is an app to organize and broadcast results of a simple tournament to other people's devices
 
 # Installation
-* Published on Google Play store <a herf="https://play.google.com/store/apps/details?id=com.akikieng.genesis.yolobear">here</a>
+* Published on Google Play store <a href="https://play.google.com/store/apps/details?id=com.akikieng.genesis.yolobear">here</a>
 * Available on the web <a href="http://genesis.akikieng.com/yolo-bear/">here</a>
 
 # Following an existing tournament 
