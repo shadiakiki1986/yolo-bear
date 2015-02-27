@@ -4,7 +4,7 @@
 
 set -e
 
-version=0.0.0
+version=0.0.1
 output=~/Yolobear_${version}_arm.apk
 
 rm -f $output

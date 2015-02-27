@@ -1,6 +1,10 @@
 I'm tring to follow Semantic Versioning 2.0.0
 http://semver.org/
 
+=V0.0.1=
+2015-02-27
+* added "Saved" section with locally saved games
+
 =V0.0.0=
 2015-02-26
 * when nickname is empty, the ID of the server is shown on the server's peer list instead of the ID of the connector peer

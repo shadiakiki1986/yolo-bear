@@ -19,6 +19,7 @@
         <script src="js/YoloBearGame.js"></script>
         <script src="js/YoloBearTournament.js"></script>
         <script src="js/Controller1.js"></script>
+        <script src="js/Controller2.js"></script>
         <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap-3.3.2.min.css">
         <link rel="stylesheet" type="text/css" href="css/index.css">
         <script src="js/vendor/bootstrap-3.3.2.min.js"></script>
@@ -47,6 +48,7 @@
           <li><a id="Teams" class="btn btn-lg">Teams<span class="badge">{{ybt.teams.length}}</span></a></li>
           <li><a id="Players" class="btn btn-lg">Players<span class="badge">{{ybt.players.length}}</span></a></li>
           <li><a id="Games" class="btn btn-lg btn-primary">Games<span class="badge">{{ybt.nGamesState('Done')}} / {{ybt.games.length}}</span></a></li>
+          <li><a id="Saved" class="btn btn-lg btn-info">Saved<span class="badge">{{savedTournamentsLocalN}}</span></a></li>
         </ul>
         </div>
         </div>
@@ -58,6 +60,7 @@
           <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&& dataReceiving&&conns[whoIsAdmin()].open"><img src="img/onf.png" alt="On" height=25 width=25></span>
           <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&& doingDataBroadcast"><img src="img/micro_on.png" alt="Broadcasting" height=25 width=25></span>
           <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&&!doingDataBroadcast"><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
+          <span ng-show="autosaveIsOn">v</span>
       </div>
 
       <div id="ybpConnectDiv" hidden>
@@ -244,6 +247,35 @@
     </div> <!-- end Games div -->
 
    
+    <div id="SavedDiv" hidden>
+      <div ng-controller="Controller2">
+         Save current tournament locally
+         <input type="text" ng-model="sct" placeholder="Tournament name" ng-disabled="astl">
+         <button ng-click="saveTournamentLocal(sct); sct='';" ng-disabled="astl||!sct||!newTournamentCan()" class="btn btn-primary">Save</button>
+  
+         <br><br>
+  
+         <table class="table">
+           <caption>Tournaments saved locally</caption>
+           <tr ng-show="savedTournamentsLocal().length==0"><td>None</td></tr>
+           <tr>
+              <td>New tournament</td>
+              <td><button ng-click="newTournamentLoad()" ng-disabled="!newTournamentCan()||astl" class="btn">Load</button></td>
+           </tr>
+           <tr ng-repeat="stl in savedTournamentsLocal()">
+             <td>{{stl}}</td>
+             <td>
+               <button ng-click="loadTournamentLocal(stl)" ng-disabled="isSameAsTournament(stl)" class="btn">Load</button>
+               <button ng-click="saveTournamentLocal(stl)" ng-disabled="isSameAsTournament(stl)" class="btn btn-primary">Save</button>
+               <button ng-click="autosaveSet(stl)" ng-show="!astl" ng-disabled="!isSameAsTournament(stl)" class="btn btn-info">Autosave</button>
+               <button ng-click="autosaveRemove()" ng-show="astl && astl==stl" class="btn btn-warning">Cancel autosave</button>
+               <button ng-click="delTournamentLocal(stl)" ng-disabled="astl && astl==stl" class="btn btn-danger">Del</button>
+             </td>
+           </tr>
+         </table>
+      </div><!-- end Controller2 -->
+    </div><!-- end Saved div -->
+
 </div> <!-- end Controller1 -->
 
 <div hidden>  

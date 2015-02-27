@@ -89,8 +89,13 @@ $scope.setGamePlayerScore=function(ga,gpsid,sn,sv) {
     $scope.$broadcast("decideBroadcast");
   };
 
-  $scope.copyToClipboard=function(text) {
-     window.prompt("Copy to clipboard: Ctrl+C, Enter", text);
- };
+  $scope.autosaveIsOn=false;
+  $scope.savedTournamentsLocalN=0;
+
+  $scope.newTournamentCan=function() { return $scope.ybt.teams.length>0||$scope.ybt.players.length>0||$scope.ybt.games.length>0; };
+  $scope.newTournamentLoad=function() {
+    $scope.ybt=new YoloBearTournament();
+    $scope.requestDataBroadcast();
+  };
 
 }
