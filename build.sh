@@ -5,6 +5,7 @@
 set -e
 
 version=0.0.1
+versionCode=2
 output=~/Yolobear_${version}_arm.apk
 
 rm -f $output
@@ -14,6 +15,7 @@ python ~/crosswalk-10.39.235.15/make_apk.py \
   --keystore-path=~/yolo-bear.keystore \
   --keystore-alias=yolo-bear \
   --app-version=${version} \
+  --app-versionCode=${versionCode} \
   --arch=arm \
   --target-dir=~ \
   --verbose
