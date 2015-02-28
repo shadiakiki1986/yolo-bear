@@ -91,6 +91,7 @@ $scope.setGamePlayerScore=function(ga,gpsid,sn,sv) {
 
   $scope.autosaveIsOn=false;
   $scope.savedTournamentsLocalN=0;
+  $scope.savedTournamentsServerN=0;
 
   $scope.newTournamentCan=function() { return $scope.ybt.teams.length>0||$scope.ybt.players.length>0||$scope.ybt.games.length>0; };
   $scope.newTournamentLoad=function() {

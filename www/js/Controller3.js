@@ -12,6 +12,7 @@ function Controller3($scope,$http) {
           return;
         }
         $scope.savedTournaments=angular.fromJson(rt).sort();
+        $scope.$parent.savedTournamentsServerN=$scope.savedTournaments.length;
       }).
       error( function(rt,et) {
         alert("Error listing tournaments on server. "+et);
