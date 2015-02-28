@@ -98,4 +98,5 @@ $scope.setGamePlayerScore=function(ga,gpsid,sn,sv) {
     $scope.requestDataBroadcast();
   };
 
+  $scope.isLocal=false;
 }

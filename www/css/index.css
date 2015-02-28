@@ -3,3 +3,5 @@ td { white-space: nowrap; }
 .isOpentrue { font-weight: bold; }
 .isOpenfalse { text-decoration: line-through; }
 .isOpen { font-style: italic; } /* unknown open or not */
+
+

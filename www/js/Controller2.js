@@ -21,6 +21,8 @@ function Controller2($scope) {
     }
 
     $scope.$emit('responseDataBroadcast',stl[0].ybt);
+    $scope.lastLoaded=name;
+    $scope.$parent.isLocal=true;
   };
 
   $scope.saveTournamentLocal=function(name) {
@@ -31,7 +33,6 @@ function Controller2($scope) {
       stlc=stlc.filter(function(x) { return x.name!=name; });
       stlc.push({name:name,ybt:$scope.$parent.ybt});
       window.localStorage.setItem("savedTournamentsLocal",angular.toJson(stlc));
-      if(!$scope.astl & !$scope.sct) alert("Tournament saved");
     }
   };
 
@@ -57,5 +58,6 @@ function Controller2($scope) {
 
   $scope.isSameAsTournament=function(name) { return angular.toJson(loadTournamentLocalCore(name)[0].ybt)==angular.toJson($scope.$parent.ybt); };
 
+  $scope.lastLoaded=null;
 
 }

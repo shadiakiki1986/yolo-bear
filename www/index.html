@@ -20,6 +20,7 @@
         <script src="js/YoloBearTournament.js"></script>
         <script src="js/Controller1.js"></script>
         <script src="js/Controller2.js"></script>
+        <script src="js/Controller3.js"></script>
         <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap-3.3.2.min.css">
         <link rel="stylesheet" type="text/css" href="css/index.css">
         <script src="js/vendor/bootstrap-3.3.2.min.js"></script>
@@ -144,7 +145,7 @@
 
     <div id="TeamsDiv" hidden>
         <div ng-show="iAmAdmin()" class="form-inline form-group">
-            <input type='text' ng-model="newTeam.name" placeholder="New team name" required class="form-control"><button ng-click="addTeam()" ng-disabled="!newTeam.name" class="btn btn-primary">Add</button>
+            <input type='text' ng-model="newTeam.name" placeholder="New team name" required class="form-control"><button ng-click="addTeam()" ng-disabled="!newTeam.name" class="btn btn-primary">+</button>
         </div>
         <div ng-show="ybt.teams.length==0">No teams added yet</div>
         <table ng-show="ybt.teams.length>0" class="table">
@@ -158,7 +159,7 @@
               <td ng-repeat="sn in ybt.statNames">
                  {{te.gamesStat(sn)}}
               </td>
-              <td><button ng-show="iAmAdmin()" ng-click="delTeam(te.id)" class="btn btn-danger">Del</button></td>
+              <td><button ng-show="iAmAdmin()" ng-click="delTeam(te.id)" class="btn btn-danger glyphicon glyphicon-trash"></button></td>
               <td>{{te.playersNames()}}</td>
             </tr>
         </tbody>
@@ -172,7 +173,7 @@
             <select ng-model="newPlayer.team" ng-options="te.id as te.name for te in ybt.teams" required class="form-control">
               <option value="" disabled selected>Team</option>
             </select>
-            <button ng-click="addPlayer()" ng-disabled="!newPlayer.name||!ybt.teamIdExists(newPlayer.team)" class="btn btn-primary">Add</button>
+            <button ng-click="addPlayer()" ng-disabled="!newPlayer.name||!ybt.teamIdExists(newPlayer.team)" class="btn btn-primary">+</button>
         </div>
 
         Players<br>
@@ -186,7 +187,7 @@
               <td ng-repeat="sn in ybt.statNames">
                  {{pl.gamesStat(sn)}}
               </td>
-              <td><button ng-show="iAmAdmin()" ng-click="delPlayer(pl.id)" class="btn btn-danger">Del</button></td>
+              <td><button ng-show="iAmAdmin()" ng-click="delPlayer(pl.id)" class="btn btn-danger glyphicon glyphicon-trash"></button></td>
             </tr>
         </tbody>
         </table>
@@ -209,7 +210,7 @@
             New game<br>
             <select ng-model="newGame.team1" ng-options="te.id as te.name for te in ybt.teams" class="form-control"></select> &nbsp;
             <select ng-model="newGame.team2" ng-options="te.id as te.name for te in ybt.teams" class="form-control"></select> &nbsp;
-            <button ng-click="addGame()" ng-disabled="newGame.team1==newGame.team2||!ybt.teamIdExists(newGame.team1)||!ybt.teamIdExists(newGame.team2)" class="btn btn-primary">Add</button>
+            <button ng-click="addGame()" ng-disabled="newGame.team1==newGame.team2||!ybt.teamIdExists(newGame.team1)||!ybt.teamIdExists(newGame.team2)" class="btn btn-primary">+</button>
             <br>
         </div>
 
@@ -225,7 +226,7 @@
             <option value="Playing">Playing</option>
             <option value="Done">Done</option>
         </select>
-        <button ng-show="iAmAdmin()" ng-click="delGame(ga.id)" class="btn btn-small btn-danger">Del</button>
+        <button ng-show="iAmAdmin()" ng-click="delGame(ga.id)" class="btn btn-small btn-danger glyphicon glyphicon-trash"></button>
         <table class="table" ng-show="showGamesState!='Waiting'">
         <thead><tr><th>Team</th><th>Player</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th></tr></thead>
         <tbody>
@@ -249,31 +250,77 @@
    
     <div id="SavedDiv" hidden>
       <div ng-controller="Controller2">
-         Save current tournament locally
-         <input type="text" ng-model="sct" placeholder="Tournament name" ng-disabled="astl">
-         <button ng-click="saveTournamentLocal(sct); sct='';" ng-disabled="astl||!sct||!newTournamentCan()" class="btn btn-primary">Save</button>
-  
-         <br><br>
   
          <table class="table">
            <caption>Tournaments saved locally</caption>
+           <tr><td colspan=6>
+             <input type="text" ng-model="sct" placeholder="Current tournament name" ng-disabled="astl">
+             <button ng-click="saveTournamentLocal(sct); sct='';" ng-disabled="astl||!sct||!newTournamentCan()" class="btn btn-primary">Save local</button>
+           </td></tr>
            <tr ng-show="savedTournamentsLocal().length==0"><td>None</td></tr>
            <tr>
+              <td><span ng-show="!newTournamentCan()" class="glyphicon glyphicon-ok"></span></td>
               <td>New tournament</td>
-              <td><button ng-click="newTournamentLoad()" ng-disabled="!newTournamentCan()||astl" class="btn">Load</button></td>
+              <td>
+                 <button class="btn" ng-click="newTournamentLoad()" ng-show=" newTournamentCan()&&!astl">Load&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                 <button class="btn" ng-click="newTournamentLoad()" ng-show="!newTournamentCan()|| astl" disabled>Loaded</button>
+             </td>
+             <td></td><td></td><td></td>
            </tr>
            <tr ng-repeat="stl in savedTournamentsLocal()">
+             <td><span ng-show="isLocal&&lastLoaded==stl&&newTournamentCan()" class="glyphicon glyphicon-ok"></span></td>
              <td>{{stl}}</td>
              <td>
-               <button ng-click="loadTournamentLocal(stl)" ng-disabled="isSameAsTournament(stl)" class="btn">Load</button>
-               <button ng-click="saveTournamentLocal(stl)" ng-disabled="isSameAsTournament(stl)" class="btn btn-primary">Save</button>
-               <button ng-click="autosaveSet(stl)" ng-show="!astl" ng-disabled="!isSameAsTournament(stl)" class="btn btn-info">Autosave</button>
-               <button ng-click="autosaveRemove()" ng-show="astl && astl==stl" class="btn btn-warning">Cancel autosave</button>
-               <button ng-click="delTournamentLocal(stl)" ng-disabled="astl && astl==stl" class="btn btn-danger">Del</button>
+               <button class="btn" ng-click="loadTournamentLocal(stl)" ng-show="!isSameAsTournament(stl)">Load&nbsp;&nbsp;&nbsp;&nbsp;</button>
+               <button class="btn" ng-click="loadTournamentLocal(stl)" ng-show=" isSameAsTournament(stl)" disabled>Loaded</button>
+             </td>
+             <td>
+               <button class="btn btn-primary" ng-click="saveTournamentLocal(stl)" ng-show="!isSameAsTournament(stl)">Save&nbsp;&nbsp;</button>
+               <button class="btn btn-primary" ng-click="saveTournamentLocal(stl)" ng-show=" isSameAsTournament(stl)" disabled>Saved</button>
+             </td>
+             <td>
+               <button class="btn btn-info" ng-click="autosaveSet(stl)" ng-show="!astl" ng-disabled="!isSameAsTournament(stl)">Autosave</button>
+               <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl==stl">Cancel autosave</button>
+             </td>
+             <td>
+               <button class="btn btn-danger glyphicon glyphicon-trash" ng-click="delTournamentLocal(stl)" ng-disabled="astl && astl==stl"></button>
              </td>
            </tr>
          </table>
       </div><!-- end Controller2 -->
+
+      <hr>
+
+      <div ng-controller="Controller3">
+
+         <table class="table">
+           <caption>Tournaments on server &nbsp; <button ng-click="list()" ng-disabled="anyAjaxWorking()" class="btn">Refresh</button></caption>
+           <tr><td colspan=6>
+             <input type="text" ng-model="sctn" placeholder="Current tournament name" ng-disabled="astl">
+             <input type="password" ng-model="sctp" placeholder="Password" ng-disabled="astl">
+             <button ng-click="saveCore(sctn,sctp); sctn=''; sctp='';" ng-disabled="astl||!sctn||!sctp||!newTournamentCan()" class="btn btn-primary">Save to server</button>
+           </td></tr> 
+           <tr ng-show="savedTournaments.length==0"><td>None</td></tr>
+           <tr ng-repeat="stl in savedTournaments">
+             <td><span ng-show="!isLocal&&lastLoaded==stl&&newTournamentCan()" class="glyphicon glyphicon-ok"></span></td>
+             <td>{{stl}}</td>
+             <td>
+               <button class="btn" ng-click="get(stl)" ng-disabled="anyAjaxWorking()">Load</button>
+             </td>
+             <td>
+               <button class="btn btn-primary" ng-click="save(stl)" ng-disabled="anyAjaxWorking()">Save</button>
+             </td>
+             <td>
+               <button class="btn btn-info" ng-click="autosaveSet(stl)" ng-show="!astl">Autosave</button>
+               <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl.name==stl">Cancel autosave</button>
+             </td>
+             <td>
+               <button class="btn btn-danger glyphicon glyphicon-trash" ng-click="del(stl)" ng-disabled="(astl && astl.name==stl)||anyAjaxWorking()"></button>
+             </td>
+           </tr>
+         </table>
+      </div><!-- end Controller3 -->
+
     </div><!-- end Saved div -->
 
 </div> <!-- end Controller1 -->

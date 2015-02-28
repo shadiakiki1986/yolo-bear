@@ -2,6 +2,9 @@ I'm tring to follow Semantic Versioning 2.0.0
 http://semver.org/
 
 =V0.0.1=
+2015-02-28
+* added "saved" section with server saved games
+
 2015-02-27
 * added "Saved" section with locally saved games
 
