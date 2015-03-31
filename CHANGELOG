@@ -2,6 +2,12 @@ I'm tring to follow Semantic Versioning 2.0.0
 http://semver.org/
 
 =V0.0.1=
+2015-03-31
+* added nicknames posted to bulletin on server
+** needed since peerjs doesn't support similar functionality
+** also added a password to protect a user's nickname
+** password is generated internally by javascript
+
 2015-02-28
 * added "saved" section with server saved games
 

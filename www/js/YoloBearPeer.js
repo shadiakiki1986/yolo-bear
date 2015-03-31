@@ -1,4 +1,4 @@
-function YoloBearPeer($scope) {
+function YoloBearPeer($scope,$http) {
   
   $scope.nickName = null;
   $scope.nickName2= null;
@@ -10,6 +10,7 @@ function YoloBearPeer($scope) {
   $scope.msg='';
   $scope.id=null;
   $scope.admins={}; // associative array of timestamps, where the keys are the peer ids. This gives a sorted list of prioritization for being admin on the tournament
+  nickPwd=Math.random().toString(36).substring(7);
 
     $scope.connAttemptN=0;
 
@@ -225,6 +226,7 @@ function YoloBearPeer($scope) {
     if($scope.peer.disconnected||$scope.peer.destroyed||!$scope.peer.id||$scope.peerError) return; // do nothing
 
     $scope.listAllPeersStatus=true;
+
     // cleaning up entries before getting updated list from server
     Object.keys($scope.conns).map(function(x) {
       if(Object.keys($scope.conns[x]).length==0) {
@@ -233,6 +235,7 @@ function YoloBearPeer($scope) {
           delete $scope.conns[x];
       }
     });
+
     // get list of peers on server
     $scope.peer.listAllPeers(function(lap) {
       lap
@@ -242,21 +245,55 @@ function YoloBearPeer($scope) {
        }); });
       $scope.$apply(function() { $scope.listAllPeersStatus=false; });
     });
+
+    // get list of nicknames on server
+    $http.get(YOLOBEAR_SERVER_URL+'/listNick.php').
+      success( function(rt) {
+        if(rt.error) {
+          alert("Error: "+rt.error);
+          return;
+        }
+        Object.keys(rt).map(function(x) { $scope.nicks[x]=rt[x]; });
+      }).
+      error( function(rt,et) {
+        alert("Error listing nicknames on server. "+et);
+      })
+    ;
+
     // in case this takes too long
     setTimeout(function() { $scope.$apply(function() { $scope.listAllPeersStatus=false; }); }, PEERJS_TIMEOUT);
   };
 
   $scope.updateNickName=function() {
     $scope.nickName2=$scope.nickName;
-    if($scope.isUnconnectedToAnyone()) return;
-    wia=$scope.whoIsAdmin();
-    if(wia==$scope.id) {
-       $scope.nicks[wia]=$scope.nickName;
-       $scope.broadcastListResponse();
-    } else {
-       $scope.closePeer(wia);
-       $scope.connectOut(wia);
+    if(!$scope.isUnconnectedToAnyone()) {
+      wia=$scope.whoIsAdmin();
+      if(wia==$scope.id) {
+         // change nickname and broadcast
+         $scope.nicks[wia]=$scope.nickName;
+         $scope.broadcastListResponse();
+      } else {
+         // disconnect and reconnect with new nickname
+         $scope.closePeer(wia);
+         $scope.connectOut(wia);
+      }
     }
+    // post nickname to bulletin board on dynamodb server
+    $http.post(
+        YOLOBEAR_SERVER_URL+'/putNick.php',
+        {peerId:$scope.id,nick:$scope.nickName,pwd:nickPwd}
+      ).
+      success( function(rt) {
+        if(rt.error) {
+          alert("Error: "+rt.error);
+          return;
+        }
+      }).
+      error( function(rt,et) {
+        alert("Error posting nickname to server. "+et);
+      })
+    ;
+
   };
 
 }
