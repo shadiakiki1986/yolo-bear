@@ -1,3 +1,8 @@
+* a separate process should exist for getting nicknames/peerIDs' registered emails
+** user should see a flag that a nickname/peerID is validated
+** regardless of whether connected (getting data from peers) or not (getting data from dynamodb)
+** this requires yolo-bear-server getEmail.php to support an extra parameter peerId that attaches to the row
+
 * got to make my own heartbeat from admin2 to admin1
 ** because when admin1 disconnected from wifi on tablet, no disconnect event was fired for admin2 in browser
 * disconnect button causes root scope in progress error in angular
