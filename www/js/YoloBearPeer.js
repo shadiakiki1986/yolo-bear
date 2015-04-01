@@ -1,6 +1,24 @@
 function YoloBearPeer($scope,$http) {
   
-  $scope.nickName{val:null,old:null,pwd:Math.random().toString(36).substring(7)};
+  $scope.nickName={
+    val:null,
+    old:null,
+    pwd:Math.random().toString(36).substring(7),
+    warning:"",
+    error:""
+  };
+
+  $scope.regist={
+    email0:null,
+    pwd:null,
+    nick:"", // get this from $scope.nickName.val
+    metaD:"",
+    warning:"",
+    error:"",
+    isNew:null,
+    loggedIn:false,
+    inProgress:false
+  };
 
   $scope.conns={};
   $scope.msgs={};
@@ -262,9 +280,9 @@ function YoloBearPeer($scope,$http) {
     setTimeout(function() { $scope.$apply(function() { $scope.listAllPeersStatus=false; }); }, PEERJS_TIMEOUT);
   };
 
-  $scope.makeNickNameOld=function() return $scope.nickName.val+","$scope.nickName.email0;
   $scope.updateNickName=function() {
-    $scope.nickName.old=$scope.makeNickNameOld();
+    $scope.nickName.old=$scope.nickName.val;
+
     if(!$scope.isUnconnectedToAnyone()) {
       wia=$scope.whoIsAdmin();
       if(wia==$scope.id) {
@@ -277,18 +295,24 @@ function YoloBearPeer($scope,$http) {
          $scope.connectOut(wia);
       }
     }
+
     // post nickname to bulletin board on dynamodb server
+    $scope.nickName.warning="";
+    $scope.nickName.error="";
     $http.post(
         YOLOBEAR_SERVER_URL+'/putNick.php',
         { peerId:$scope.id,
           nick:$scope.nickName.val,
-          pwd:$scope.nickName.pwd,
-          email0:$scope.nickName.email0
+          pwd:$scope.nickName.pwd
         }
       ).
       success( function(rt) {
         if(rt.error) {
-          alert("Error: "+rt.error);
+          $scope.nickName.error=rt.error;
+          return;
+        }
+        if(rt.warning) {
+          $scope.nickName.warning=rt.warning;
           return;
         }
       }).
@@ -297,7 +321,116 @@ function YoloBearPeer($scope,$http) {
       })
     ;
 
+    // if registered email included
+    if($scope.regist.loggedIn) {
+      $scope.regist.warning="";
+      $scope.regist.error="";
+      $http.post(
+        YOLOBEAR_SERVER_URL+'/putEmail.php',
+        { email0:$scope.regist.email0,
+          pwd:$scope.regist.pwd,
+          nick:$scope.nickName.val,
+          metaD:$scope.regist.metaD
+        }
+      ).
+      success( function(rt) {
+        if(rt.error) {
+          $scope.regist.error=rt.error;
+          return;
+        }
+        if(rt.warning) {
+          $scope.regist.warning=rt.warning;
+          return;
+        }
+      }).
+      error( function(rt,et) {
+        alert("Error posting registered email to server. "+et);
+      });
+    }
+
+
   };
 
+  $scope.putEmail=function() {
+      $scope.regist.inProgress=true;
+      $scope.regist.warning="";
+      $scope.regist.error="";
+      $http.post(
+        YOLOBEAR_SERVER_URL+'/putEmail.php',
+        { email0:$scope.regist.email0,
+          pwd:$scope.regist.pwd,
+          nick:$scope.nickName.val,
+          metaD:$scope.regist.metaD
+        }
+      ).
+      success( function(rt) {
+        if(rt.error) {
+          $scope.regist.error=rt.error;
+          $scope.regist.inProgress=false;
+          return;
+        }
+        if(rt.warning) {
+          $scope.regist.warning=rt.warning;
+          $scope.regist.inProgress=false;
+          return;
+        }
+        $scope.regist.inProgress=false;
+      }).
+      error( function(rt,et) {
+        $scope.regist.inProgress=false;
+        alert("Error registering/updating email to server. "+et);
+      });
+  };
+
+  $scope.getEmail=function() {
+      $scope.regist.inProgress=true;
+      $scope.regist.warning="";
+      $scope.regist.error="";
+      $http.post(
+        YOLOBEAR_SERVER_URL+'/getEmail.php',
+        { email0:$scope.regist.email0,
+          pwd:$scope.regist.pwd
+        }
+      ).
+      success( function(rt) {
+        if(rt.error) {
+          $scope.regist.error=rt.error;
+          $scope.regist.inProgress=false;
+          return;
+        }
+        if(rt.warning) {
+          $scope.regist.warning=rt.warning;
+          $scope.regist.inProgress=false;
+          return;
+        }
+        $scope.nickName.val=rt.nick;
+        $scope.updateNickName();
+
+        $scope.regist.loggedIn=true;
+        $scope.regist.inProgress=false;
+        //$('#backBtn4').click();
+        $('#LoginDiv1').show();
+        $('#backBtn2Div').show();
+        $('#LoginDiv2').hide();
+        $('#backBtn4Div').hide();
+        //$('#backBtn2').click();
+        $('#tournamentDiv').show();
+        $('#LoginDiv1').hide();
+        $('#backBtn2Div').hide();
+      }).
+      error( function(rt,et) {
+        $scope.regist.inProgress=false;
+        alert("Error loggin in/registering email to server. "+et);
+      });
+  };
+
+  $scope.logout=function() {
+      $scope.regist.inProgress=false;
+      $scope.regist.warning="";
+      $scope.regist.error="";
+      $scope.regist.email0="";
+      $scope.regist.pwd="";
+      $scope.regist.loggedIn=false;
+  };
 
 }

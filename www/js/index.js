@@ -3,21 +3,21 @@
     // Show browser version
     $('#browsers').text(navigator.userAgent);
 
-    $('#ybpConnectConnectBtn').click(function() {
-         $('#ybpConnectDiv').hide();
-         $('#tournamentDiv').show();
-    });
-    $('#Chat,#Teams,#Players,#Games,#backBtn,#Saved').click(function() {
+    $('#Login,#Chat,#Teams,#Players,#Games,#backBtn,#Saved').click(function() {
        $('#tournamentDiv').hide();
     });
-    $('#Chat,#Teams,#Players,#Games,#Saved').click(function() {
+    $('#Login,#Chat,#Teams,#Players,#Games,#Saved').click(function() {
        $('#backBtn2Div').show();
+    });
+    $('#Login').click(function() {
+       $('#LoginDiv1').show();
     });
     $('#Chat').click(function() {
        $('#ybpConnectDiv').show();
     });
     $('#backBtn2').click(function() {
        $('#tournamentDiv').show();
+       $('#LoginDiv1').hide();
        $('#ybpConnectDiv').hide();
        $('#TeamsDiv').hide();
        $('#PlayersDiv').hide();
@@ -49,6 +49,19 @@
        $('#backBtn2Div').show();
        $('#GamesDiv').hide();
        $('#backBtn3Div').hide();
+    });
+
+    $('#LoginNew,#LoginExisting').click(function() {
+       $('#LoginDiv1').hide();
+       $('#backBtn2Div').hide();
+       $('#LoginDiv2').show();
+       $('#backBtn4Div').show();
+    });
+    $('#backBtn4').click(function() {
+       $('#LoginDiv1').show();
+       $('#backBtn2Div').show();
+       $('#LoginDiv2').hide();
+       $('#backBtn4Div').hide();
     });
 
   });

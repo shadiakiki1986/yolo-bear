@@ -9,7 +9,7 @@ YoloBearPeerCore=function($scope) {
 	$scope.msgs[id]=[];
 	$scope.lists[id]=[];
         $scope.admins[id]=moment().valueOf();
-        $scope.nicks[id]=$scope.nickName; // my own nickname
+        $scope.nicks[id]=$scope.nickName.val; // my own nickname
 
         // get list of peers on server
 	$scope.listAllPeers();

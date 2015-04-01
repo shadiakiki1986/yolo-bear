@@ -4,6 +4,9 @@ http://semver.org/
 =V0.0.1=
 2015-04-01
 * added email to protect a nickname... have yet to test
+* turns out my design was shit... split out nicknames from emails
+* now can register email,pwd,and metadata separate from nickname submission
+* duplicate nicknames allowed ATM
 
 2015-03-31
 * added nicknames posted to bulletin on server

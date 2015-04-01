@@ -34,6 +34,7 @@
             <div class="muted pull-right"><img src="img/logo.png" alt="logo" width=40 height=40></div>
             <div hidden class="pull-left" id="backBtn2Div"><button class="btn" id="backBtn2">Back</button></div>
             <div hidden class="pull-left" id="backBtn3Div"><button class="btn" id="backBtn3">Back</button></div>
+            <div hidden class="pull-left" id="backBtn4Div"><button class="btn" id="backBtn4">Back</button></div>
         </div>
 
 <div ng-controller="Controller1" id="Controller1">
@@ -45,6 +46,8 @@
         <div id="tournamentDiv">
         <div class="row">
         <ul class="nav nav-pills nav-stacked">
+          <li><a id="Login" class="btn btn-lg btn-primary" ng-show="!regist.loggedIn">Log in</a></li>
+          <li><a id="Logout" class="btn btn-lg btn-warning" ng-show="regist.loggedIn" ng-click="logout()">Log out<br>{{regist.email0}}</a></li>
           <li><a id="Chat" class="btn btn-lg btn-info" ng-click="listAllPeers()">Connect<span class="badge">{{peers().length}}</span></a></li>
           <li><a id="Teams" class="btn btn-lg">Teams<span class="badge">{{ybt.teams.length}}</span></a></li>
           <li><a id="Players" class="btn btn-lg">Players<span class="badge">{{ybt.players.length}}</span></a></li>
@@ -62,6 +65,23 @@
           <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&& doingDataBroadcast"><img src="img/micro_on.png" alt="Broadcasting" height=25 width=25></span>
           <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&&!doingDataBroadcast"><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
           <span ng-show="autosaveIsOn">v</span>
+      </div>
+
+      <div id="LoginDiv1" hidden>
+        <ul class="nav nav-pills nav-stacked">
+          <li><a id="LoginNew" class="btn btn-lg btn-primary" ng-click="regist.isNew=true">New user</a></li>
+          <li><a id="LoginExisting" class="btn btn-lg btn-info" ng-click="regist.isNew=false">Existing user</a></li>
+	</ul>
+      </div>
+
+      <div id="LoginDiv2" hidden>
+	<input type="text" size=30 ng-model="regist.email0" placeholder="Email">
+	<br>
+	<input type="text" size=30 ng-model="regist.pwd" placeholder="Password" ng-show="!regist.isNew">
+        <button ng-click="getEmail()" ng-disabled="regist.inProgress" ng-show="!regist.isNew">Log in</button>
+        <button ng-click="putEmail()" ng-disabled="regist.inProgress" ng-show=" regist.isNew">Register</button>
+	<div ng-show="regist.warning">Warning: {{regist.warning}}</div>
+	<div ng-show="regist.error">Error: {{regist.error}}</div>
       </div>
 
       <div id="ybpConnectDiv" hidden>
@@ -88,12 +108,13 @@
               <span class="glyphicon glyphicon-user"></span>
             </td>
             <td>
+              <span class="text-muted">{{id}}</span>
               <div class="form-inline">
                 <input type="text" ng-model="nickName.val" placeholder="Nickname" size=10>
-                <input type="text" ng-model="nickName.email0" placeholder="Password-protect nickname (optional)">
-                <button ng-click="updateNickName()" class="btn btn-info btn-xs" ng-disabled="makeNickNameOld()==nickName.old">&gt;&gt;</button>
+                <button ng-click="updateNickName()" class="btn btn-info btn-xs" ng-disabled="nickName.val==nickName.old">&gt;&gt;</button>
+                <div ng-show="nickName.warning">Warning: {{nickName.warning}}</div>
+                <div ng-show="nickName.error">Error: {{nickName.error}}</div>
               </div>
-              <span class="text-muted">{{id}}</span>
             </td>
             <td>
               <div ng-show="!peer.disconnected&&!peer.destroyed&&peer.id&&!peerError" class="form-inline form-group">
