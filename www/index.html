@@ -89,8 +89,9 @@
             </td>
             <td>
               <div class="form-inline">
-                <input type="text" ng-model="nickName" placeholder="Nickname" size=10>
-                <button ng-click="updateNickName()" class="btn btn-info btn-xs" ng-disabled="nickName==nickName2">&gt;&gt;</button>
+                <input type="text" ng-model="nickName.val" placeholder="Nickname" size=10>
+                <input type="text" ng-model="nickName.email0" placeholder="Password-protect nickname (optional)">
+                <button ng-click="updateNickName()" class="btn btn-info btn-xs" ng-disabled="makeNickNameOld()==nickName.old">&gt;&gt;</button>
               </div>
               <span class="text-muted">{{id}}</span>
             </td>

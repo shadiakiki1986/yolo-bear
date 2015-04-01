@@ -1,7 +1,6 @@
 function YoloBearPeer($scope,$http) {
   
-  $scope.nickName = null;
-  $scope.nickName2= null;
+  $scope.nickName{val:null,old:null,pwd:Math.random().toString(36).substring(7)};
 
   $scope.conns={};
   $scope.msgs={};
@@ -10,7 +9,6 @@ function YoloBearPeer($scope,$http) {
   $scope.msg='';
   $scope.id=null;
   $scope.admins={}; // associative array of timestamps, where the keys are the peer ids. This gives a sorted list of prioritization for being admin on the tournament
-  nickPwd=Math.random().toString(36).substring(7);
 
     $scope.connAttemptN=0;
 
@@ -118,7 +116,7 @@ function YoloBearPeer($scope,$http) {
       })}, PEERJS_TIMEOUT); 
 
     // connect
-    c=$scope.peer.connect(id,{metadata:{nick:$scope.nickName}});
+    c=$scope.peer.connect(id,{metadata:{nick:$scope.nickName.val}});
     c.on('open', function() { $scope.$apply(function() {
         if($scope.connectOutId.hasOwnProperty(id)) {
            clearTimeout($scope.connectOutId[id]);
@@ -264,13 +262,14 @@ function YoloBearPeer($scope,$http) {
     setTimeout(function() { $scope.$apply(function() { $scope.listAllPeersStatus=false; }); }, PEERJS_TIMEOUT);
   };
 
+  $scope.makeNickNameOld=function() return $scope.nickName.val+","$scope.nickName.email0;
   $scope.updateNickName=function() {
-    $scope.nickName2=$scope.nickName;
+    $scope.nickName.old=$scope.makeNickNameOld();
     if(!$scope.isUnconnectedToAnyone()) {
       wia=$scope.whoIsAdmin();
       if(wia==$scope.id) {
          // change nickname and broadcast
-         $scope.nicks[wia]=$scope.nickName;
+         $scope.nicks[wia]=$scope.nickName.val;
          $scope.broadcastListResponse();
       } else {
          // disconnect and reconnect with new nickname
@@ -281,7 +280,11 @@ function YoloBearPeer($scope,$http) {
     // post nickname to bulletin board on dynamodb server
     $http.post(
         YOLOBEAR_SERVER_URL+'/putNick.php',
-        {peerId:$scope.id,nick:$scope.nickName,pwd:nickPwd}
+        { peerId:$scope.id,
+          nick:$scope.nickName.val,
+          pwd:$scope.nickName.pwd,
+          email0:$scope.nickName.email0
+        }
       ).
       success( function(rt) {
         if(rt.error) {
@@ -295,5 +298,6 @@ function YoloBearPeer($scope,$http) {
     ;
 
   };
+
 
 }
