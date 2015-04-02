@@ -8,6 +8,8 @@ http://semver.org/
 * app displays verified accounts with emails in parentheses
 * logging in now one-step instead of two-steps
 * remembering/forgetting credentials
+* split out dynamo controller from peer controller
+* added support for multiple saved emails
 
 2015-04-01
 * added email to protect a nickname... have yet to test

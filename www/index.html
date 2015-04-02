@@ -18,6 +18,7 @@
         <script src="js/YoloBearTeam.js"></script>
         <script src="js/YoloBearGame.js"></script>
         <script src="js/YoloBearTournament.js"></script>
+        <script src="js/YoloBearDynamo.js"></script>
         <script src="js/Controller1.js"></script>
         <script src="js/Controller2.js"></script>
         <script src="js/Controller3.js"></script>
@@ -43,128 +44,137 @@
 
     <div ng-controller="YoloBearPeer">
 
-        <div id="tournamentDiv">
-        <div class="row">
-        <ul class="nav nav-pills nav-stacked">
-          <li><a id="Login" class="btn btn-lg btn-primary" ng-show="!regist.loggedIn" ng-click="loginPre()">Log in</a></li>
-          <li><a id="Logout" class="btn btn-lg btn-warning" ng-show="regist.loggedIn" ng-click="logout()">Log out<br>{{regist.email0}}</a></li>
-          <li><a id="Chat" class="btn btn-lg btn-info" ng-click="listAllPeers()">Connect<span class="badge">{{peers().length}}</span></a></li>
-          <li><a id="Teams" class="btn btn-lg">Teams<span class="badge">{{ybt.teams.length}}</span></a></li>
-          <li><a id="Players" class="btn btn-lg">Players<span class="badge">{{ybt.players.length}}</span></a></li>
-          <li><a id="Games" class="btn btn-lg btn-primary">Games<span class="badge">{{ybt.nGamesState('Done')}} / {{ybt.games.length}}</span></a></li>
-          <li><a id="Saved" class="btn btn-lg btn-info">Saved<span class="badge">{{savedTournamentsLocalN}}, {{savedTournamentsServerN}}</span></a></li>
-        </ul>
-        </div>
-        </div>
-        
+        <div ng-controller="YoloBearDynamo">
+            <div id="tournamentDiv">
+            <div class="row">
+            <ul class="nav nav-pills nav-stacked">
+              <li><a id="Login" class="btn btn-lg btn-primary" ng-show="!regist.loggedIn" ng-click="loginPre()">Log in</a></li>
+              <li><a id="Logout" class="btn btn-lg btn-warning" ng-show="regist.loggedIn" ng-click="logout(true)">Log out<br>{{regist.email0}}</a></li>
+              <li><a id="Chat" class="btn btn-lg btn-info" ng-click="listAllPeers()">Connect<span class="badge">{{peers().length}}</span></a></li>
+              <li><a id="Teams" class="btn btn-lg">Teams<span class="badge">{{ybt.teams.length}}</span></a></li>
+              <li><a id="Players" class="btn btn-lg">Players<span class="badge">{{ybt.players.length}}</span></a></li>
+              <li><a id="Games" class="btn btn-lg btn-primary">Games<span class="badge">{{ybt.nGamesState('Done')}} / {{ybt.games.length}}</span></a></li>
+              <li><a id="Saved" class="btn btn-lg btn-info">Saved<span class="badge">{{savedTournamentsLocalN}}, {{savedTournamentsServerN}}</span></a></li>
+            </ul>
+            </div>
+            </div>
+            
+          <div id="LoginDiv1" hidden>
+           <!--   <li><a id="LoginExisting" class="btn btn-lg btn-info" ng-click="regist.isNew=false">Existing user</a></li>-->
+            <input type="text" size=30 ng-model="regist.email0" placeholder="Email">
+            <br>
+            <input type="password" size=30 ng-model="regist.pwd" placeholder="Password">
+            <br>
+            <button ng-click="getEmail()" ng-disabled="regist.inProgress">Log in</button>
+            <button id="LoginNew" class="btn btn-lg btn-primary">New user</button>
+            <button ng-click="loginForget()" ng-show="loginForgettable()">Forget</button>
+    
+            <div ng-show="regist.warning">Warning: {{regist.warning}}</div>
+            <div ng-show="regist.error">Error: {{regist.error}}</div>
 
-      <div id="onoff">
-          <span ng-show="whoIsAdmin()!=id&&(isUnconnectedToAnyone()||!conns[whoIsAdmin()].open)"><img src="img/off.png" alt="Off" height=25 width=25></span>
-          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&&!dataReceiving&&conns[whoIsAdmin()].open"><img src="img/on.png" alt="On" height=25 width=25></span>
-          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&& dataReceiving&&conns[whoIsAdmin()].open"><img src="img/onf.png" alt="On" height=25 width=25></span>
-          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&& doingDataBroadcast"><img src="img/micro_on.png" alt="Broadcasting" height=25 width=25></span>
-          <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&&!doingDataBroadcast"><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
-          <span ng-show="autosaveIsOn">v</span>
-      </div>
+            <div ng-show="loginForgettable()">
+              Log in as ...
+              <ul class="nav nav-pills nav-stacked">
+                <li ng-repeat="sup in regist.saved"><a class="btn btn-lg" ng-click="loginAs(sup.email0,sup.pwd)">{{sup.email0}}</a></li>
+              </ul>
+            </div>
 
-      <div id="LoginDiv1" hidden>
-       <!--   <li><a id="LoginExisting" class="btn btn-lg btn-info" ng-click="regist.isNew=false">Existing user</a></li>-->
-	<input type="text" size=30 ng-model="regist.email0" placeholder="Email">
-	<br>
-	<input type="password" size=30 ng-model="regist.pwd" placeholder="Password">
-        <button ng-click="getEmail()" ng-disabled="regist.inProgress">Log in</button>
-        <button id="LoginNew" class="btn btn-lg btn-primary">New user</button>
-        <button ng-click="loginForget()" ng-show="loginForgettable()">Forget</button>
-
-	<div ng-show="regist.warning">Warning: {{regist.warning}}</div>
-	<div ng-show="regist.error">Error: {{regist.error}}</div>
-      </div>
-
-      <div id="LoginDiv2" hidden>
-	<input type="text" size=30 ng-model="regist.email0" placeholder="Email">
-        <button ng-click="putEmail()" ng-disabled="regist.inProgress">Register</button>
-	<div ng-show="regist.warning">Warning: {{regist.warning}}</div>
-	<div ng-show="regist.error">Error: {{regist.error}}</div>
-      </div>
-
-      <div id="ybpConnectDiv" hidden>
-          <div ng-show="peer.disconnected||peer.destroyed||!peer.id||peerError" class="bg-danger">
-            <span ng-show="!autoReconnectFailed">Connecting to server <span ng-show="connAttemptN>0">(attempt {{connAttemptN}}/{{PEERJS_MAX_RECONN_ATTEMPT}})</span></span>
-            <span ng-show=" autoReconnectFailed">
-               Failed to connect to server &nbsp;
-               <button ng-click="connAttemptN=0; autoReconnectFailed=false; manualConnect();">Try again</button>
-            </span>
+          </div>
+    
+          <div id="LoginDiv2" hidden>
+            <input type="text" size=30 ng-model="regist.email0" placeholder="Email">
+            <button ng-click="putEmail()" ng-disabled="regist.inProgress">Register</button>
+            <div ng-show="regist.warning">Warning: {{regist.warning}}</div>
+            <div ng-show="regist.error">Error: {{regist.error}}</div>
           </div>
 
-
-      <div id="chat_area" ng-show="peer.id"><!-- ng-show="peers().length>0"> -->
-<!--        <input type="text" ng-model="msg" placeholder="Enter message">-->
-<!--    <button ng-click="copyToClipboard(id)" class="btn">Copy</button>-->
-<!--    	<ul>
-    	  <li ng-repeat="pm in peerMsgs(id)">{{pm.ts}}: {{pm.msg}}</li>
-    	</ul>-->
-        <table class="table">
-        <tr>
-            <td>
-              <span ng-show="id==whoIsAdmin()" ><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
-              <span ng-show="id==whoIsAdmin2()"><img src="img/micro_off.png" alt="Admin" height=25 width=25 style="opacity: 0.4;"></span>
-              <span class="glyphicon glyphicon-user"></span>
-            </td>
-            <td>
-              <span class="text-muted">{{id}}</span>
-              <div class="form-inline">
-                <input type="text" ng-model="nickName.val" placeholder="Nickname" size=10>
-                <button ng-click="updateNickName()" class="btn btn-info btn-xs" ng-disabled="nickName.val==nickName.old">&gt;&gt;</button>
-                <div ng-show="nickName.warning">Warning: {{nickName.warning}}</div>
-                <div ng-show="nickName.error">Error: {{nickName.error}}</div>
-              </div>
-            </td>
-            <td>
-              <div ng-show="!peer.disconnected&&!peer.destroyed&&peer.id&&!peerError" class="form-inline form-group">
-                <button ng-click="listAllPeers()" class="btn" ng-disabled="listAllPeersStatus">Refresh</button>
-              </div><!-- end div !peer.disconnected -->
-            </td>
-        </tr>
-        <tr ng-show="peers().length==0"><td>No peers</td></tr>
-        <tr ng-repeat="p in peers()">
-          <td>
-            <span ng-show="p==whoIsAdmin()" ><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
-            <span ng-show="p==whoIsAdmin2()"><img src="img/micro_off.png" alt="Admin" height=25 width=25 style="opacity: 0.4;"></span>
-          </td>
-    	  <td class="isOpen{{conns[p].open}}" ng-switch="nicks.hasOwnProperty(p)">
-              <span ng-switch-when="true">
-                <span ng-switch="nicks[p]==null||nicks[p]==''">
-                  <span ng-switch-when="true">{{p}}</span>
-                  <span ng-switch-default>
-                    {{nicks[p]}}
-                    <br>
-                    <span class="text-muted">{{p}}</span>
-                  </span>
+          <div id="onoff">
+              <span ng-show="whoIsAdmin()!=id&&(isUnconnectedToAnyone()||!conns[whoIsAdmin()].open)"><img src="img/off.png" alt="Off" height=25 width=25></span>
+              <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&&!dataReceiving&&conns[whoIsAdmin()].open"><img src="img/on.png" alt="On" height=25 width=25></span>
+              <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&& dataReceiving&&conns[whoIsAdmin()].open"><img src="img/onf.png" alt="On" height=25 width=25></span>
+              <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&& doingDataBroadcast"><img src="img/micro_on.png" alt="Broadcasting" height=25 width=25></span>
+              <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&&!doingDataBroadcast"><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
+              <span ng-show="autosaveIsOn">v</span>
+          </div>
+    
+          <div id="ybpConnectDiv" hidden>
+              <div ng-show="peer.disconnected||peer.destroyed||!peer.id||peerError" class="bg-danger">
+                <span ng-show="!autoReconnectFailed">Connecting to server <span ng-show="connAttemptN>0">(attempt {{connAttemptN}}/{{PEERJS_MAX_RECONN_ATTEMPT}})</span></span>
+                <span ng-show=" autoReconnectFailed">
+                   Failed to connect to server &nbsp;
+                   <button ng-click="connAttemptN=0; autoReconnectFailed=false; manualConnect();">Try again</button>
                 </span>
-              </span>
-              <span ng-switch-default>
-                 {{p}}
-              </span>
-          </td>
-<!--          <td>
-          &nbsp; {{peerList(p)}} &nbsp;
-          </td>-->
-          <td>
-             <button ng-click="connectOut(p)" ng-show="!conns[p].open" class="btn btn-info" ng-disabled="connectOutId.hasOwnProperty(p)||(conns[p].hasOwnProperty('open')&&!conns[p].open)">+</button>
-             <button ng-click="closePeer(p)" ng-show=" conns[p].open" class="btn btn-warning">x</button>
-             <button ng-click="assignAdmin1(p)" ng-show="id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A1</button>
-             <button ng-click="assignAdmin2(p)" ng-show="p!=whoIsAdmin2()&&id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A2</button>
-          </td>
-<!--    	  <ul>
-    	  <li ng-repeat="pm in peerMsgs(p)">{{pm.ts}}: {{pm.msg}}</li>
-    	  </ul>-->
-        </tr>
-        </table>
-      </div>
-
-      </div>
-      
-
+              </div>
+    
+    
+              <div id="chat_area" ng-show="peer.id"><!-- ng-show="peers().length>0"> -->
+        <!--        <input type="text" ng-model="msg" placeholder="Enter message">-->
+        <!--    <button ng-click="copyToClipboard(id)" class="btn">Copy</button>-->
+        <!--    	<ul>
+            	  <li ng-repeat="pm in peerMsgs(id)">{{pm.ts}}: {{pm.msg}}</li>
+            	</ul>-->
+                <table class="table">
+                <tr>
+                    <td>
+                      <span ng-show="id==whoIsAdmin()" ><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
+                      <span ng-show="id==whoIsAdmin2()"><img src="img/micro_off.png" alt="Admin" height=25 width=25 style="opacity: 0.4;"></span>
+                      <span class="glyphicon glyphicon-user"></span>
+                    </td>
+                    <td>
+                      <span class="text-muted">{{id}}<span ng-show="regist.email0 && regist.loggedIn"> ({{regist.email0}})</span></span>
+                      <div class="form-inline">
+                        <input type="text" ng-model="nickName.val" placeholder="Nickname" size=10>
+                        <button ng-click="updateNickName()" class="btn btn-info btn-xs" ng-disabled="nickName.val==nickName.old">&gt;&gt;</button>
+                        <div ng-show="nickName2.warning">Warning: {{nickName2.warning}}</div>
+                        <div ng-show="nickName2.error">Error: {{nickName2.error}}</div>
+                      </div>
+                    </td>
+                    <td>
+                      <div ng-show="!peer.disconnected&&!peer.destroyed&&peer.id&&!peerError" class="form-inline form-group">
+                        <button ng-click="listAllPeers()" class="btn" ng-disabled="listAllPeersStatus">Refresh</button>
+                      </div><!-- end div !peer.disconnected -->
+                    </td>
+                </tr>
+                <tr ng-show="peers().length==0"><td>No peers</td></tr>
+                <tr ng-repeat="p in peers()">
+                  <td>
+                    <span ng-show="p==whoIsAdmin()" ><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
+                    <span ng-show="p==whoIsAdmin2()"><img src="img/micro_off.png" alt="Admin" height=25 width=25 style="opacity: 0.4;"></span>
+                  </td>
+            	  <td class="isOpen{{conns[p].open}}" ng-switch="nicks.hasOwnProperty(p)">
+                      <span ng-switch-when="true">
+                        <span ng-switch="nicks[p]==null||nicks[p]==''">
+                          <span ng-switch-when="true">{{p}}</span>
+                          <span ng-switch-default>
+                            {{nicks[p]}}
+                            <br>
+                            <span class="text-muted">{{p}}</span>
+                          </span>
+                        </span>
+                      </span>
+                      <span ng-switch-default>
+                         {{p}}
+                      </span>
+                  </td>
+        <!--          <td>
+                  &nbsp; {{peerList(p)}} &nbsp;
+                  </td>-->
+                  <td>
+                     <button ng-click="connectOut(p)" ng-show="!conns[p].open" class="btn btn-info" ng-disabled="connectOutId.hasOwnProperty(p)||(conns[p].hasOwnProperty('open')&&!conns[p].open)">+</button>
+                     <button ng-click="closePeer(p)" ng-show=" conns[p].open" class="btn btn-warning">x</button>
+                     <button ng-click="assignAdmin1(p)" ng-show="id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A1</button>
+                     <button ng-click="assignAdmin2(p)" ng-show="p!=whoIsAdmin2()&&id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A2</button>
+                  </td>
+        <!--    	  <ul>
+            	  <li ng-repeat="pm in peerMsgs(p)">{{pm.ts}}: {{pm.msg}}</li>
+            	  </ul>-->
+                </tr>
+                </table>
+              </div><!-- end chat_area -->
+    
+          </div><!-- end ybpConnectDiv -->
+          
+     </div><!-- end YoloBearDynamo -->
      </div><!-- end YoloBearPeer-->
 
 
