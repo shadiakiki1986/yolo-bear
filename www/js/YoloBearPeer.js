@@ -12,10 +12,10 @@ function YoloBearPeer($scope,$http) {
     email0:null,
     pwd:null,
     nick:"", // get this from $scope.nickName.val
+    peerId:"",
     metaD:"",
     warning:"",
     error:"",
-    isNew:null,
     loggedIn:false,
     inProgress:false
   };
@@ -269,7 +269,23 @@ function YoloBearPeer($scope,$http) {
           alert("Error: "+rt.error);
           return;
         }
-        Object.keys(rt).map(function(x) { $scope.nicks[x]=rt[x]; });
+
+        Object.keys(rt).map(function(x) {
+		temp="";
+		if(rt[x].nick && rt[x].email0) {
+			temp=rt[x].nick+" ("+rt[x].email0+")";
+		} else if(rt[x].nick && !rt[x].email0) {
+			temp=rt[x].nick;
+		} else if(!rt[x].nick && rt[x].email0) {
+			temp=rt[x].email0;
+		} else {
+			temp="";
+		}
+		$scope.nicks[x]=temp;
+
+		// if found other nickname with registered email as mine, I must have been logged out
+		if(rt[x].email0==$scope.regist.email0 && $scope.regist.loggedIn && x!=$scope.id) $scope.logout();
+	});
       }).
       error( function(rt,et) {
         alert("Error listing nicknames on server. "+et);
@@ -323,35 +339,12 @@ function YoloBearPeer($scope,$http) {
 
     // if registered email included
     if($scope.regist.loggedIn) {
-      $scope.regist.warning="";
-      $scope.regist.error="";
-      $http.post(
-        YOLOBEAR_SERVER_URL+'/putEmail.php',
-        { email0:$scope.regist.email0,
-          pwd:$scope.regist.pwd,
-          nick:$scope.nickName.val,
-          metaD:$scope.regist.metaD
-        }
-      ).
-      success( function(rt) {
-        if(rt.error) {
-          $scope.regist.error=rt.error;
-          return;
-        }
-        if(rt.warning) {
-          $scope.regist.warning=rt.warning;
-          return;
-        }
-      }).
-      error( function(rt,et) {
-        alert("Error posting registered email to server. "+et);
-      });
+      $scope.putEmail();
     }
-
 
   };
 
-  $scope.putEmail=function() {
+  $scope.putEmail=function(useEmptyPeerId) {
       $scope.regist.inProgress=true;
       $scope.regist.warning="";
       $scope.regist.error="";
@@ -360,6 +353,7 @@ function YoloBearPeer($scope,$http) {
         { email0:$scope.regist.email0,
           pwd:$scope.regist.pwd,
           nick:$scope.nickName.val,
+          peerId:(useEmptyPeerId?"":$scope.id),
           metaD:$scope.regist.metaD
         }
       ).
@@ -403,9 +397,6 @@ function YoloBearPeer($scope,$http) {
           $scope.regist.inProgress=false;
           return;
         }
-        $scope.nickName.val=rt.nick;
-        $scope.updateNickName();
-
         $scope.regist.loggedIn=true;
         $scope.regist.inProgress=false;
         //$('#backBtn4').click();
@@ -417,6 +408,11 @@ function YoloBearPeer($scope,$http) {
         $('#tournamentDiv').show();
         $('#LoginDiv1').hide();
         $('#backBtn2Div').hide();
+
+        $scope.nickName.val=rt.nick;
+        $scope.updateNickName(); // update nickname with the new nickname
+
+	window.localStorage.setItem("regist",angular.toJson({email0:$scope.regist.email0,pwd:$scope.regist.pwd}));
       }).
       error( function(rt,et) {
         $scope.regist.inProgress=false;
@@ -425,6 +421,7 @@ function YoloBearPeer($scope,$http) {
   };
 
   $scope.logout=function() {
+      $scope.putEmail(true);
       $scope.regist.inProgress=false;
       $scope.regist.warning="";
       $scope.regist.error="";
@@ -433,4 +430,28 @@ function YoloBearPeer($scope,$http) {
       $scope.regist.loggedIn=false;
   };
 
+  $scope.loginForget=function() {
+      if($scope.loginForgettable()) {
+        $scope.logout();
+        localStorage.removeItem("regist");
+      }
+  };
+
+  $scope.loginForgettable=function() {
+      return(localStorage.getItem("regist") !== null);
+  };
+
+
+  $scope.loginPre=function() {
+    if(localStorage.getItem("regist") !== null) {
+      temp=angular.fromJson(localStorage.getItem("regist"));
+      $scope.regist.email0=temp.email0;
+      $scope.regist.pwd=temp.pwd;
+      //$scope.getEmail();
+    }
+  };
+
+  angular.element(document).ready(function() {
+    $scope.loginPre();
+  });
 }

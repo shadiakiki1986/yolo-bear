@@ -2,6 +2,13 @@ I'm tring to follow Semantic Versioning 2.0.0
 http://semver.org/
 
 =V0.0.1=
+2015-04-02
+* logging in puts the current peerId in the registered emails table so that unconnected users can see verified accounts
+* logout also erases last peerId from registered emails table so that unconnected users stop seeing verified accounts
+* app displays verified accounts with emails in parentheses
+* logging in now one-step instead of two-steps
+* remembering/forgetting credentials
+
 2015-04-01
 * added email to protect a nickname... have yet to test
 * turns out my design was shit... split out nicknames from emails

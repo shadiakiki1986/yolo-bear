@@ -46,7 +46,7 @@
         <div id="tournamentDiv">
         <div class="row">
         <ul class="nav nav-pills nav-stacked">
-          <li><a id="Login" class="btn btn-lg btn-primary" ng-show="!regist.loggedIn">Log in</a></li>
+          <li><a id="Login" class="btn btn-lg btn-primary" ng-show="!regist.loggedIn" ng-click="loginPre()">Log in</a></li>
           <li><a id="Logout" class="btn btn-lg btn-warning" ng-show="regist.loggedIn" ng-click="logout()">Log out<br>{{regist.email0}}</a></li>
           <li><a id="Chat" class="btn btn-lg btn-info" ng-click="listAllPeers()">Connect<span class="badge">{{peers().length}}</span></a></li>
           <li><a id="Teams" class="btn btn-lg">Teams<span class="badge">{{ybt.teams.length}}</span></a></li>
@@ -68,18 +68,21 @@
       </div>
 
       <div id="LoginDiv1" hidden>
-        <ul class="nav nav-pills nav-stacked">
-          <li><a id="LoginNew" class="btn btn-lg btn-primary" ng-click="regist.isNew=true">New user</a></li>
-          <li><a id="LoginExisting" class="btn btn-lg btn-info" ng-click="regist.isNew=false">Existing user</a></li>
-	</ul>
+       <!--   <li><a id="LoginExisting" class="btn btn-lg btn-info" ng-click="regist.isNew=false">Existing user</a></li>-->
+	<input type="text" size=30 ng-model="regist.email0" placeholder="Email">
+	<br>
+	<input type="password" size=30 ng-model="regist.pwd" placeholder="Password">
+        <button ng-click="getEmail()" ng-disabled="regist.inProgress">Log in</button>
+        <button id="LoginNew" class="btn btn-lg btn-primary">New user</button>
+        <button ng-click="loginForget()" ng-show="loginForgettable()">Forget</button>
+
+	<div ng-show="regist.warning">Warning: {{regist.warning}}</div>
+	<div ng-show="regist.error">Error: {{regist.error}}</div>
       </div>
 
       <div id="LoginDiv2" hidden>
 	<input type="text" size=30 ng-model="regist.email0" placeholder="Email">
-	<br>
-	<input type="text" size=30 ng-model="regist.pwd" placeholder="Password" ng-show="!regist.isNew">
-        <button ng-click="getEmail()" ng-disabled="regist.inProgress" ng-show="!regist.isNew">Log in</button>
-        <button ng-click="putEmail()" ng-disabled="regist.inProgress" ng-show=" regist.isNew">Register</button>
+        <button ng-click="putEmail()" ng-disabled="regist.inProgress">Register</button>
 	<div ng-show="regist.warning">Warning: {{regist.warning}}</div>
 	<div ng-show="regist.error">Error: {{regist.error}}</div>
       </div>
