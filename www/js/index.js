@@ -89,3 +89,27 @@ function compareGames(a,b) {
   return 0;
 };
 
+function comparePeers(a,b,regist,nicks) {
+// a, b: peer ids
+// sorting: trusted peers, peers with emails, sorted emails, peers with nicknames, sorted nicknames, sorted peer ids
+  if( nicks[a] && !nicks[b] ) return -1;
+  if(!nicks[a] &&  nicks[b] ) return +1;
+  if( nicks[a] &&  nicks[b] ) {
+    if( nicks[a].email && !nicks[b].email) return -1;
+    if(!nicks[a].email &&  nicks[b].email) return +1;
+    if(regist.metaD && regist.metaD.network.length>0) {
+       if(regist.metaD.network.indexOf(nicks[a].email)!=-1 && regist.metaD.network.indexOf(nicks[b].email)==-1) return -1;
+       if(regist.metaD.network.indexOf(nicks[a].email)==-1 && regist.metaD.network.indexOf(nicks[b].email)!=-1) return +1;
+    }
+    if(nicks[a].email < nicks[b].email) return -1;
+    if(nicks[a].email > nicks[b].email) return +1;
+    if( nicks[a].val && !nicks[b].val) return -1;
+    if(!nicks[a].val &&  nicks[b].val) return +1;
+    if(nicks[a].val < nicks[b].val) return -1;
+    if(nicks[a].val > nicks[b].val) return +1;
+  }
+  if(a < b) return -1;
+  if(a > b) return +1;
+  return 0;
+};
+

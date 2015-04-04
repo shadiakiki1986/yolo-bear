@@ -75,7 +75,7 @@
             <div ng-show="loginForgettable()">
               Log in as ...
               <ul class="nav nav-pills nav-stacked">
-                <li ng-repeat="sup in regist.saved"><a class="btn btn-lg" ng-click="loginAs(sup.email0,sup.pwd)">{{sup.email0}}</a></li>
+                <li ng-repeat="sup in regist.saved"><a class="btn btn-lg" ng-click="regist.email0=sup.email0; regist.pwd=sup.pwd; getEmail()">{{sup.email0}}</a></li>
               </ul>
             </div>
 
@@ -121,7 +121,10 @@
                       <span class="glyphicon glyphicon-user"></span>
                     </td>
                     <td>
-                      <span class="text-muted">{{id}}<span ng-show="regist.email0 && regist.loggedIn"> ({{regist.email0}})</span></span>
+                      <span class="text-muted">
+                         {{id}} <br>
+                         <span ng-show="regist.email0 && regist.loggedIn"> ({{regist.email0}})</span>
+                      </span>
                       <div class="form-inline">
                         <input type="text" ng-model="nickName.val" placeholder="Nickname" size=10>
                         <button ng-click="updateNickName()" class="btn btn-info btn-xs" ng-disabled="nickName.val==nickName.old">&gt;&gt;</button>
@@ -131,24 +134,47 @@
                     </td>
                     <td>
                       <div ng-show="!peer.disconnected&&!peer.destroyed&&peer.id&&!peerError" class="form-inline form-group">
-                        <button ng-click="listAllPeers()" class="btn" ng-disabled="listAllPeersStatus">Refresh</button>
+                        <button ng-click="listAllPeers()" class="btn" ng-disabled="listAllPeersStatus"><span class="glyphicon glyphicon-refresh"></span></button>
                       </div><!-- end div !peer.disconnected -->
                     </td>
                 </tr>
                 <tr ng-show="peers().length==0"><td>No peers</td></tr>
-                <tr ng-repeat="p in peers()">
+                <tr ng-repeat="p in peersSorted()">
                   <td>
                     <span ng-show="p==whoIsAdmin()" ><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
                     <span ng-show="p==whoIsAdmin2()"><img src="img/micro_off.png" alt="Admin" height=25 width=25 style="opacity: 0.4;"></span>
+                    <span ng-show="regist.metaD && regist.metaD.network.length>0 && regist.metaD.network.indexOf(nicks[p].email)!=-1" class="glyphicon glyphicon-heart-empty"></span>
                   </td>
             	  <td class="isOpen{{conns[p].open}}" ng-switch="nicks.hasOwnProperty(p)">
                       <span ng-switch-when="true">
-                        <span ng-switch="nicks[p]==null||nicks[p]==''">
-                          <span ng-switch-when="true">{{p}}</span>
+                        <span ng-switch="nicks[p].val==''">
+                          <span ng-switch-when="true">
+                            <span ng-switch="nicks[p].email==''">
+                              <span ng-switch-when="true">
+                                {{p}}
+                              </span>
+                              <span ng-switch-default>
+                                {{nicks[p].email}}
+                                <br>
+                                <span class="text-muted">{{p}}</span>
+                              </span>
+                            </span>
+                          </span>
                           <span ng-switch-default>
-                            {{nicks[p]}}
-                            <br>
-                            <span class="text-muted">{{p}}</span>
+                            <span ng-switch="nicks[p].email==''">
+                              <span ng-switch-when="true">
+                                {{nicks[p].val}}
+                                <br>
+                                <span class="text-muted">{{p}}</span>
+                              </span>
+                              <span ng-switch-default>
+                                {{nicks[p].email}}
+                                <br>
+                                {{nicks[p].val}}
+                                <br>
+                                <span class="text-muted">{{p}}</span>
+                              </span>
+                            </span>
                           </span>
                         </span>
                       </span>
@@ -162,6 +188,8 @@
                   <td>
                      <button ng-click="connectOut(p)" ng-show="!conns[p].open" class="btn btn-info" ng-disabled="connectOutId.hasOwnProperty(p)||(conns[p].hasOwnProperty('open')&&!conns[p].open)">+</button>
                      <button ng-click="closePeer(p)" ng-show=" conns[p].open" class="btn btn-warning">x</button>
+                     <button ng-click="removeFromTrustedNetwork(nicks[p].email)" ng-show="regist.loggedIn && nicks[p].email && regist.metaD && regist.metaD.network.length>0 && regist.metaD.network.indexOf(nicks[p].email)!=-1" class="btn btn-danger"><span class="glyphicon glyphicon-heart-empty"></span></button>
+                     <button ng-click="addToTrustedNetwork(nicks[p].email)" ng-show="regist.loggedIn && nicks[p].email && (!regist.metaD || regist.metaD.network.length==0 || regist.metaD.network.indexOf(nicks[p].email)==-1)" class="btn btn-success"><span class="glyphicon glyphicon-heart-empty"></span></button>
                      <button ng-click="assignAdmin1(p)" ng-show="id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A1</button>
                      <button ng-click="assignAdmin2(p)" ng-show="p!=whoIsAdmin2()&&id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A2</button>
                   </td>
@@ -329,7 +357,7 @@
       <div ng-controller="Controller3">
 
          <table class="table">
-           <caption>Tournaments on server &nbsp; <button ng-click="list()" ng-disabled="anyAjaxWorking()" class="btn">Refresh</button></caption>
+           <caption>Tournaments on server &nbsp; <button ng-click="list()" ng-disabled="anyAjaxWorking()" class="btn"><span class="glyphicon glyphicon-refresh"></span></button></caption>
            <tr><td colspan=6>
              <input type="text" ng-model="sctn" placeholder="Current tournament name" ng-disabled="astl">
              <input type="password" ng-model="sctp" placeholder="Password" ng-disabled="astl">

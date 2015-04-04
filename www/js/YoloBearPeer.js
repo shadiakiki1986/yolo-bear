@@ -3,7 +3,8 @@ function YoloBearPeer($scope,$http) {
   $scope.nickName={
     val:null,
     old:null,
-    pwd:Math.random().toString(36).substring(7)
+    pwd:Math.random().toString(36).substring(7),
+    email:null
   };
 
   $scope.conns={};
@@ -120,7 +121,7 @@ function YoloBearPeer($scope,$http) {
       })}, PEERJS_TIMEOUT); 
 
     // connect
-    c=$scope.peer.connect(id,{metadata:{nick:$scope.nickName.val}});
+    c=$scope.peer.connect(id,{metadata:{nick:$scope.nickName.val,email:$scope.nickName.email}});
     c.on('open', function() { $scope.$apply(function() {
         if($scope.connectOutId.hasOwnProperty(id)) {
            clearTimeout($scope.connectOutId[id]);
@@ -262,7 +263,7 @@ function YoloBearPeer($scope,$http) {
       wia=$scope.whoIsAdmin();
       if(wia==$scope.id) {
          // change nickname and broadcast
-         $scope.nicks[wia]=$scope.nickName.val;
+         $scope.nicks[wia].val=$scope.nickName.val;
          $scope.broadcastListResponse();
       } else {
          // disconnect and reconnect with new nickname
@@ -277,4 +278,5 @@ function YoloBearPeer($scope,$http) {
   };
 
   $scope.$on('setNick',function(event,peerId,nick) { $scope.nicks[peerId]=nick; });
+
 }

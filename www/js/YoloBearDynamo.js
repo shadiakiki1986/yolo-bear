@@ -28,17 +28,8 @@ function YoloBearDynamo($scope,$http) {
         }
 
         Object.keys(rt).map(function(x) {
-		temp="";
-		if(rt[x].nick && rt[x].email0) {
-			temp=rt[x].nick+" ("+rt[x].email0+")";
-		} else if(rt[x].nick && !rt[x].email0) {
-			temp=rt[x].nick;
-		} else if(!rt[x].nick && rt[x].email0) {
-			temp=rt[x].email0;
-		} else {
-			temp="";
-		}
-                $scope.$emit("setNick",x,temp);
+		//if(rt[x].nick && rt[x].email0) {
+                $scope.$emit("setNick",x,{val:rt[x].nick,email:rt[x].email0});
 
 		// if found other nickname with registered email as mine, I must have been logged out
 		if(rt[x].email0==$scope.regist.email0 && $scope.regist.loggedIn && x!=$scope.id) {
@@ -46,6 +37,7 @@ function YoloBearDynamo($scope,$http) {
 			$scope.logout();
 		}
 	});
+
       }).
       error( function(rt,et) {
         alert("Error listing nicknames on server. "+et);
@@ -91,13 +83,14 @@ function YoloBearDynamo($scope,$http) {
       $scope.regist.inProgress=true;
       $scope.regist.warning="";
       $scope.regist.error="";
+console.log("putEmail",$scope.regist.metaD);
       $http.post(
         YOLOBEAR_SERVER_URL+'/putEmail.php',
         { email0:$scope.regist.email0,
           pwd:$scope.regist.pwd,
           nick:$scope.$parent.nickName.val,
           peerId:(useEmptyPeerId?"":$scope.id),
-          metaD:$scope.regist.metaD
+          metaD:angular.toJson($scope.regist.metaD)
         }
       ).
       success( function(rt) {
@@ -153,11 +146,24 @@ function YoloBearDynamo($scope,$http) {
         $('#backBtn2Div').hide();
 
         $scope.$parent.nickName.val=rt.nick;
+        $scope.$parent.nickName.email=$scope.regist.email0;
         $scope.updateNickName(); // update nickname with the new nickname
 
         // save to local storage
         $scope.regist.saved[$scope.regist.email0]={email0:$scope.regist.email0,pwd:$scope.regist.pwd};
 	window.localStorage.setItem("regist",angular.toJson($scope.regist.saved));
+
+        // process meta-data
+        $scope.regist.metaD=angular.fromJson(rt.metaD);
+console.log("metadata",$scope.regist.metaD);
+        if(!$scope.regist.metaD) $scope.regist.metaD={};
+        if(!$scope.regist.metaD.hasOwnProperty('network')) $scope.regist.metaD={network:[]};
+
+        // announce the list of trusted nicksPlusEmails from the metadata
+        if($scope.regist.metaD.network.length>0) {
+           $scope.$emit('getEmailNetwork',$scope.regist.metaD.network);
+        }
+
       }).
       error( function(rt,et) {
         $scope.regist.inProgress=false;
@@ -197,9 +203,23 @@ function YoloBearDynamo($scope,$http) {
     }
   };
 
-  $scope.loginAs=function(u,p) {
-      $scope.regist.email0=u;
-      $scope.regist.pwd=p;
-      $scope.getEmail();
+  $scope.addToTrustedNetwork=function(email) {
+    if($scope.regist.loggedIn && $scope.regist.metaD.network.indexOf(email)==-1 && email!='') {
+      $scope.regist.metaD.network.push(email);
+      // useless // $scope.regist.metaD.network=$scope.regist.metaD.network.unique();
+      $scope.putEmail(); // update to dynamo table
+    }
   };
+
+  $scope.removeFromTrustedNetwork=function(email) {
+    if($scope.regist.loggedIn && $scope.regist.metaD.network.indexOf(email)!=-1 && email!='') {
+      $scope.regist.metaD.network=$scope.regist.metaD.network.diff(email);
+      // useless // $scope.regist.metaD.network=$scope.regist.metaD.network.unique();
+      $scope.putEmail(); // update to dynamo table
+    }
+  };
+
+
+  $scope.peersSorted=function() { return $scope.$parent.peers().sort(function(a,b) { return comparePeers(a,b,$scope.regist,$scope.$parent.nicks); }); };
+
 }

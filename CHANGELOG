@@ -2,6 +2,10 @@ I'm tring to follow Semantic Versioning 2.0.0
 http://semver.org/
 
 =V0.0.2=
+2015-04-04
+* added (un)favoriting connections of registered users
+* sorting peers by favorited, email, nickname, peer ID
+
 2015-04-02
 * logging in puts the current peerId in the registered emails table so that unconnected users can see verified accounts
 * logout also erases last peerId from registered emails table so that unconnected users stop seeing verified accounts
