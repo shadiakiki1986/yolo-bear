@@ -46,6 +46,7 @@ $scope.$on('responseDataBroadcast',function(event,ybt) {
   for(var i=0;i<temp.games.length;i++) {
     $scope.ybt.games.push(new YoloBearGame(temp.games[i],$scope.ybt));
   }
+  requestDataBroadcast();
 });
 $scope.$on('gotDataRequest',function(event,peerId) { requestDataBroadcast2(peerId); });
 
