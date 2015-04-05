@@ -22,6 +22,7 @@
         <script src="js/Controller1.js"></script>
         <script src="js/Controller2.js"></script>
         <script src="js/Controller3.js"></script>
+        <script src="js/fb.js"></script>
         <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap-3.3.2.min.css">
         <link rel="stylesheet" type="text/css" href="css/index.css">
         <script src="js/vendor/bootstrap-3.3.2.min.js"></script>
@@ -376,6 +377,9 @@
              <td>
                <button class="btn btn-info" ng-click="autosaveSet(stl)" ng-show="!astl">Autosave</button>
                <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl.name==stl">Cancel autosave</button>
+             </td>
+             <td>
+               <a class="btn btn-success"  href="http://genesis.akikieng.com/yolo-bear-server/api/get.php?tournamentName={{stl}}&format=html">Share</a>
              </td>
              <td>
                <button class="btn btn-danger glyphicon glyphicon-trash" ng-click="del(stl)" ng-disabled="(astl && astl.name==stl)||anyAjaxWorking()"></button>
