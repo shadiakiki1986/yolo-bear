@@ -29,6 +29,7 @@ YoloBearPeerCore=function($scope) {
     $scope.peer.on('disconnected', $scope.autoReconnect);
     $scope.peer.on('error', function(err) {
       $scope.peerError=true;
+	console.log(err.type);
       switch(err.type) {
         case "server-error":
         case "network": $scope.autoReconnect(); break;

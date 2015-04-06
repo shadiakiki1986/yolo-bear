@@ -24,6 +24,7 @@ function YoloBearPeer($scope,$http) {
     $scope.autoReconnectFailed=false;
     $scope.peerError=false;
     $scope.autoReconnect=function() {
+	console.log("autorecon",autoReconnectId,$scope.connAttemptN);
        if(!autoReconnectId) {
           if($scope.connAttemptN<PEERJS_MAX_RECONN_ATTEMPT) {
             $scope.$apply(function() { $scope.connAttemptN+=1; });
@@ -37,12 +38,18 @@ function YoloBearPeer($scope,$http) {
        }
     };
 
-    $scope.manualConnect=function() {
-               if(!$scope.peer||$scope.peer.destroyed) {
-                  $scope = YoloBearPeerCore($scope);
-               } else {
-                  $scope.peer.reconnect();
-               }
+    $scope.manualConnect=function(reset) {
+	if(reset) {
+		$scope.connAttemptN=0;
+		$scope.autoReconnectFailed=false;
+	}
+       if(!$scope.peer||$scope.peer.destroyed) {
+	  console.log("manual connect: new peer core");
+	  $scope = YoloBearPeerCore($scope);
+       } else {
+	  console.log("manual connect: reuse existing peer core");
+	  $scope.peer.reconnect();
+       }
     };
     $scope.manualConnect();
 

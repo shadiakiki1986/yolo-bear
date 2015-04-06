@@ -2,6 +2,10 @@ I'm tring to follow Semantic Versioning 2.0.0
 http://semver.org/
 
 =V0.0.2=
+2015-04-06
+* share server tournament opens in new tab
+* trying to find out why I get "network" error and why it fails to reconnect
+
 2015-04-05
 * added link to static www for sharing
 

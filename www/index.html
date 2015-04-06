@@ -103,7 +103,7 @@
                 <span ng-show="!autoReconnectFailed">Connecting to server <span ng-show="connAttemptN>0">(attempt {{connAttemptN}}/{{PEERJS_MAX_RECONN_ATTEMPT}})</span></span>
                 <span ng-show=" autoReconnectFailed">
                    Failed to connect to server &nbsp;
-                   <button ng-click="connAttemptN=0; autoReconnectFailed=false; manualConnect();">Try again</button>
+                   <button ng-click="manualConnect(true);">Try again</button>
                 </span>
               </div>
     
