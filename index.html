@@ -1,0 +1,403 @@
+<!DOCTYPE HTML> 
+<html lang="en" ng-app> 
+<head>
+<title>yolo-bear</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+<meta http-equiv="Content-Language" content="en-us"> 
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+        <script src="js/vendor/jquery-2.1.1.min.js"></script>
+        <script src="js/vendor/angular-1.2.28.min.js"></script>
+        <script src="js/vendor/peer-0.3.0.min.js"></script>
+        <script src="js/vendor/moment-2.9.0.min.js"></script>
+        <script src="js/config.js"></script>
+        <script src="js/common.js"></script>
+        <script src="js/YoloBearPeer.js"></script>
+        <script src="js/YoloBearPeerCore.js"></script>
+        <script src="js/YoloBearPlayer.js"></script>
+        <script src="js/YoloBearTeam.js"></script>
+        <script src="js/YoloBearGame.js"></script>
+        <script src="js/YoloBearTournament.js"></script>
+        <script src="js/YoloBearDynamo.js"></script>
+        <script src="js/Controller1.js"></script>
+        <script src="js/Controller2.js"></script>
+        <script src="js/Controller3.js"></script>
+        <script src="js/fb.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap-3.3.2.min.css">
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <script src="js/vendor/bootstrap-3.3.2.min.js"></script>
+        <script src="js/index.js"></script>
+
+</head> 
+ 
+<body class="container"> 
+
+        <div class="row">
+            <div class="muted pull-right"><img src="img/logo.png" alt="logo" width=40 height=40></div>
+            <div hidden class="pull-left" id="backBtn2Div"><button class="btn" id="backBtn2">Back</button></div>
+            <div hidden class="pull-left" id="backBtn3Div"><button class="btn" id="backBtn3">Back</button></div>
+            <div hidden class="pull-left" id="backBtn4Div"><button class="btn" id="backBtn4">Back</button></div>
+        </div>
+
+<div ng-controller="Controller1" id="Controller1">
+
+
+
+    <div ng-controller="YoloBearPeer">
+
+        <div ng-controller="YoloBearDynamo">
+            <div id="tournamentDiv">
+            <div class="row">
+            <ul class="nav nav-pills nav-stacked">
+              <li><a id="Login" class="btn btn-lg btn-primary" ng-show="!regist.loggedIn" ng-click="loginPre()">Log in</a></li>
+              <li><a id="Logout" class="btn btn-lg btn-warning" ng-show="regist.loggedIn" ng-click="logout(true)">Log out<br>{{regist.email0}}</a></li>
+              <li><a id="Chat" class="btn btn-lg btn-info" ng-click="listAllPeers()">Connect<span class="badge">{{peers().length}}</span></a></li>
+              <li><a id="Teams" class="btn btn-lg">Teams<span class="badge">{{ybt.teams.length}}</span></a></li>
+              <li><a id="Players" class="btn btn-lg">Players<span class="badge">{{ybt.players.length}}</span></a></li>
+              <li><a id="Games" class="btn btn-lg btn-primary">Games<span class="badge">{{ybt.nGamesState('Done')}} / {{ybt.games.length}}</span></a></li>
+              <li><a id="Saved" class="btn btn-lg btn-info">Saved<span class="badge">{{savedTournamentsLocalN}}, {{savedTournamentsServerN}}</span></a></li>
+            </ul>
+            </div>
+            </div>
+            
+          <div id="LoginDiv1" hidden>
+           <!--   <li><a id="LoginExisting" class="btn btn-lg btn-info" ng-click="regist.isNew=false">Existing user</a></li>-->
+            <input type="text" size=30 ng-model="regist.email0" placeholder="Email">
+            <br>
+            <input type="password" size=30 ng-model="regist.pwd" placeholder="Password">
+            <br>
+            <button ng-click="getEmail()" ng-disabled="regist.inProgress">Log in</button>
+            <button id="LoginNew" class="btn btn-lg btn-primary">New user</button>
+            <button ng-click="loginForget()" ng-show="loginForgettable()">Forget</button>
+    
+            <div ng-show="regist.warning">Warning: {{regist.warning}}</div>
+            <div ng-show="regist.error">Error: {{regist.error}}</div>
+
+            <div ng-show="loginForgettable()">
+              Log in as ...
+              <ul class="nav nav-pills nav-stacked">
+                <li ng-repeat="sup in regist.saved"><a class="btn btn-lg" ng-click="regist.email0=sup.email0; regist.pwd=sup.pwd; getEmail()">{{sup.email0}}</a></li>
+              </ul>
+            </div>
+
+          </div>
+    
+          <div id="LoginDiv2" hidden>
+            <input type="text" size=30 ng-model="regist.email0" placeholder="Email">
+            <button ng-click="putEmail()" ng-disabled="regist.inProgress">Register</button>
+            <div ng-show="regist.warning">Warning: {{regist.warning}}</div>
+            <div ng-show="regist.error">Error: {{regist.error}}</div>
+          </div>
+
+          <div id="onoff">
+              <span ng-show="whoIsAdmin()!=id&&(isUnconnectedToAnyone()||!conns[whoIsAdmin()].open)"><img src="img/off.png" alt="Off" height=25 width=25></span>
+              <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&&!dataReceiving&&conns[whoIsAdmin()].open"><img src="img/on.png" alt="On" height=25 width=25></span>
+              <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()!=id&& dataReceiving&&conns[whoIsAdmin()].open"><img src="img/onf.png" alt="On" height=25 width=25></span>
+              <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&& doingDataBroadcast"><img src="img/micro_on.png" alt="Broadcasting" height=25 width=25></span>
+              <span ng-show="!isUnconnectedToAnyone()&&whoIsAdmin()==id&&!doingDataBroadcast"><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
+              <span ng-show="autosaveIsOn">v</span>
+          </div>
+    
+          <div id="ybpConnectDiv" hidden>
+              <div ng-show="peer.disconnected||peer.destroyed||!peer.id||peerError" class="bg-danger">
+                <span ng-show="!autoReconnectFailed">Connecting to server <span ng-show="connAttemptN>0">(attempt {{connAttemptN}}/{{PEERJS_MAX_RECONN_ATTEMPT}})</span></span>
+                <span ng-show=" autoReconnectFailed">
+                   Failed to connect to server &nbsp;
+                   <button ng-click="manualConnect(true);">Try again</button>
+                </span>
+              </div>
+    
+    
+              <div id="chat_area" ng-show="peer.id"><!-- ng-show="peers().length>0"> -->
+        <!--        <input type="text" ng-model="msg" placeholder="Enter message">-->
+        <!--    <button ng-click="copyToClipboard(id)" class="btn">Copy</button>-->
+        <!--    	<ul>
+            	  <li ng-repeat="pm in peerMsgs(id)">{{pm.ts}}: {{pm.msg}}</li>
+            	</ul>-->
+                <table class="table">
+                <tr>
+                    <td>
+                      <span ng-show="id==whoIsAdmin()" ><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
+                      <span ng-show="id==whoIsAdmin2()"><img src="img/micro_off.png" alt="Admin" height=25 width=25 style="opacity: 0.4;"></span>
+                      <span class="glyphicon glyphicon-user"></span>
+                    </td>
+                    <td>
+                      <span class="text-muted">
+                         {{id}} <br>
+                         <span ng-show="regist.email0 && regist.loggedIn"> ({{regist.email0}})</span>
+                      </span>
+                      <div class="form-inline">
+                        <input type="text" ng-model="nickName.val" placeholder="Nickname" size=10>
+                        <button ng-click="updateNickName()" class="btn btn-info btn-xs" ng-disabled="nickName.val==nickName.old">&gt;&gt;</button>
+                        <div ng-show="nickName2.warning">Warning: {{nickName2.warning}}</div>
+                        <div ng-show="nickName2.error">Error: {{nickName2.error}}</div>
+                      </div>
+                    </td>
+                    <td>
+                      <div ng-show="!peer.disconnected&&!peer.destroyed&&peer.id&&!peerError" class="form-inline form-group">
+                        <button ng-click="listAllPeers()" class="btn" ng-disabled="listAllPeersStatus"><span class="glyphicon glyphicon-refresh"></span></button>
+                      </div><!-- end div !peer.disconnected -->
+                    </td>
+                </tr>
+                <tr ng-show="peers().length==0"><td>No peers</td></tr>
+                <tr ng-repeat="p in peersSorted()">
+                  <td>
+                    <span ng-show="p==whoIsAdmin()" ><img src="img/micro_off.png" alt="Admin" height=25 width=25></span>
+                    <span ng-show="p==whoIsAdmin2()"><img src="img/micro_off.png" alt="Admin" height=25 width=25 style="opacity: 0.4;"></span>
+                    <span ng-show="regist.metaD && regist.metaD.network.length>0 && regist.metaD.network.indexOf(nicks[p].email)!=-1" class="glyphicon glyphicon-heart-empty"></span>
+                  </td>
+            	  <td class="isOpen{{conns[p].open}}" ng-switch="nicks.hasOwnProperty(p)">
+                      <span ng-switch-when="true">
+                        <span ng-switch="nicks[p].val==''">
+                          <span ng-switch-when="true">
+                            <span ng-switch="nicks[p].email==''">
+                              <span ng-switch-when="true">
+                                {{p}}
+                              </span>
+                              <span ng-switch-default>
+                                {{nicks[p].email}}
+                                <br>
+                                <span class="text-muted">{{p}}</span>
+                              </span>
+                            </span>
+                          </span>
+                          <span ng-switch-default>
+                            <span ng-switch="nicks[p].email==''">
+                              <span ng-switch-when="true">
+                                {{nicks[p].val}}
+                                <br>
+                                <span class="text-muted">{{p}}</span>
+                              </span>
+                              <span ng-switch-default>
+                                {{nicks[p].email}}
+                                <br>
+                                {{nicks[p].val}}
+                                <br>
+                                <span class="text-muted">{{p}}</span>
+                              </span>
+                            </span>
+                          </span>
+                        </span>
+                      </span>
+                      <span ng-switch-default>
+                         {{p}}
+                      </span>
+                  </td>
+        <!--          <td>
+                  &nbsp; {{peerList(p)}} &nbsp;
+                  </td>-->
+                  <td>
+                     <button ng-click="connectOut(p)" ng-show="!conns[p].open" class="btn btn-info" ng-disabled="connectOutId.hasOwnProperty(p)||(conns[p].hasOwnProperty('open')&&!conns[p].open)">+</button>
+                     <button ng-click="closePeer(p)" ng-show=" conns[p].open" class="btn btn-warning">x</button>
+                     <button ng-click="removeFromTrustedNetwork(nicks[p].email)" ng-show="regist.loggedIn && nicks[p].email && regist.metaD && regist.metaD.network.length>0 && regist.metaD.network.indexOf(nicks[p].email)!=-1" class="btn btn-danger"><span class="glyphicon glyphicon-heart-empty"></span></button>
+                     <button ng-click="addToTrustedNetwork(nicks[p].email)" ng-show="regist.loggedIn && nicks[p].email && (!regist.metaD || regist.metaD.network.length==0 || regist.metaD.network.indexOf(nicks[p].email)==-1)" class="btn btn-success"><span class="glyphicon glyphicon-heart-empty"></span></button>
+                     <button ng-click="assignAdmin1(p)" ng-show="id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A1</button>
+                     <button ng-click="assignAdmin2(p)" ng-show="p!=whoIsAdmin2()&&id==whoIsAdmin()&&conns[p].open" class="btn btn-default">&gt; A2</button>
+                  </td>
+        <!--    	  <ul>
+            	  <li ng-repeat="pm in peerMsgs(p)">{{pm.ts}}: {{pm.msg}}</li>
+            	  </ul>-->
+                </tr>
+                </table>
+              </div><!-- end chat_area -->
+    
+          </div><!-- end ybpConnectDiv -->
+          
+     </div><!-- end YoloBearDynamo -->
+     </div><!-- end YoloBearPeer-->
+
+
+    <div id="TeamsDiv" hidden>
+        <div ng-show="iAmAdmin()" class="form-inline form-group">
+            <input type='text' ng-model="newTeam.name" placeholder="New team name" required class="form-control"><button ng-click="addTeam()" ng-disabled="!newTeam.name" class="btn btn-primary">+</button>
+        </div>
+        <div ng-show="ybt.teams.length==0">No teams added yet</div>
+        <table ng-show="ybt.teams.length>0" class="table">
+        <thead><tr><th>Team</th><th>Won</th><th>Lost</th><th>Tie</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th><th></th><th>Players</th></tr></thead>
+        <tbody>
+            <tr ng-repeat="te in ybt.teams">
+              <td>{{te.name}}</td>
+              <td>{{te.gamesWon()}}</td>
+              <td>{{te.gamesLost()}}</td>
+              <td>{{te.gamesTied()}}</td>
+              <td ng-repeat="sn in ybt.statNames">
+                 {{te.gamesStat(sn)}}
+              </td>
+              <td><button ng-show="iAmAdmin()" ng-click="delTeam(te.id)" class="btn btn-danger glyphicon glyphicon-trash"></button></td>
+              <td>{{te.playersNames()}}</td>
+            </tr>
+        </tbody>
+        </table>
+
+    </div>
+    
+    <div id="PlayersDiv" hidden>
+        <div ng-show="iAmAdmin()" class="form-inline form-group">
+            <input type='text' ng-model="newPlayer.name" placeholder="New player name" required class="form-control">
+            <select ng-model="newPlayer.team" ng-options="te.id as te.name for te in ybt.teams" required class="form-control">
+              <option value="" disabled selected>Team</option>
+            </select>
+            <button ng-click="addPlayer()" ng-disabled="!newPlayer.name||!ybt.teamIdExists(newPlayer.team)" class="btn btn-primary">+</button>
+        </div>
+
+        Players<br>
+        <span ng-show="ybt.players.length==0">No players added yet</span>
+        <table ng-show="ybt.players.length>0" class="table">
+        <thead><tr><th>Team</th><th>Player</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th><th></th></tr></thead>
+        <tbody>
+            <tr ng-repeat="pl in ybt.players">
+              <td>{{pl.team().name}}</td>
+              <td>{{pl.name}}</td>
+              <td ng-repeat="sn in ybt.statNames">
+                 {{pl.gamesStat(sn)}}
+              </td>
+              <td><button ng-show="iAmAdmin()" ng-click="delPlayer(pl.id)" class="btn btn-danger glyphicon glyphicon-trash"></button></td>
+            </tr>
+        </tbody>
+        </table>
+
+    </div>
+    
+    <div id="GamesStateDiv" hidden>
+        <div class="row">
+        <ul class="nav nav-pills nav-stacked">
+          <li><a id="GamesWaiting" class="btn btn-lg btn-warning" ng-click="showGamesState='Waiting'">Waiting<span class="badge">{{ybt.nGamesState('Waiting')}}</span></a></li>
+          <li><a id="GamesPlaying" class="btn btn-lg btn-success" ng-click="showGamesState='Playing'">Playing<span class="badge">{{ybt.nGamesState('Playing')}}</span></a></li>
+          <li><a id="GamesDone" class="btn btn-lg btn-primary" ng-click="showGamesState='Done'">Done<span class="badge">{{ybt.nGamesState('Done')}}</span></a></li>
+        </ul>
+        </div>
+    </div>
+
+    <div id="GamesDiv" hidden>
+        Games<br>
+        <div ng-show="iAmAdmin()&&showGamesState=='Waiting'" class="form-inline form-group">
+            New game<br>
+            <select ng-model="newGame.team1" ng-options="te.id as te.name for te in ybt.teams" class="form-control"></select> &nbsp;
+            <select ng-model="newGame.team2" ng-options="te.id as te.name for te in ybt.teams" class="form-control"></select> &nbsp;
+            <button ng-click="addGame()" ng-disabled="newGame.team1==newGame.team2||!ybt.teamIdExists(newGame.team1)||!ybt.teamIdExists(newGame.team2)" class="btn btn-primary">+</button>
+            <br>
+        </div>
+
+
+        <div ng-show="ybt.gamesByState(showGamesState).length==0">{{showGamesState}}: No games added yet</div>
+
+        <div ng-repeat="ga in ybt.gamesByState(showGamesState)">
+        {{ga.team1().name}} ({{ga.teamStat(ga.team1().id,'Score')}})
+        x
+        {{ga.team2().name}} ({{ga.teamStat(ga.team2().id,'Score')}})
+        <select ng-model="ga.state" ng-disabled="!iAmAdmin()" ng-change="requestDataBroadcast()">
+            <option value="Waiting">Waiting</option>
+            <option value="Playing">Playing</option>
+            <option value="Done">Done</option>
+        </select>
+        <button ng-show="iAmAdmin()" ng-click="delGame(ga.id)" class="btn btn-small btn-danger glyphicon glyphicon-trash"></button>
+        <table class="table" ng-show="showGamesState!='Waiting'">
+        <thead><tr><th>Team</th><th>Player</th><th ng-repeat="sn in ybt.statNames">{{sn}}</th></tr></thead>
+        <tbody>
+            <tr ng-repeat="gps in ga.playerStats()">
+              <td>{{gps.playerTeam.name}}</td>
+              <td>{{gps.playerName}}</td>
+              <td ng-repeat="sn in ybt.statNames">
+                 {{gps[sn]}}
+                 <span ng-show="ga.state=='Playing'">
+                   <button ng-show="iAmAdmin()" ng-click="setGamePlayerScore(ga,gps.playerId,sn,gps[sn]+1)">+</button>
+                   <button ng-show="iAmAdmin()" ng-click="setGamePlayerScore(ga,gps.playerId,sn,gps[sn]-1)">-</button>
+                 </span>
+              </td>
+            </tr>
+        </tbody>
+        </table>
+        </div>
+
+    </div> <!-- end Games div -->
+
+   
+    <div id="SavedDiv" hidden>
+      <div ng-controller="Controller2">
+  
+         <table class="table">
+           <caption>Tournaments saved locally</caption>
+           <tr><td colspan=6>
+             <input type="text" ng-model="sct" placeholder="Current tournament name" ng-disabled="astl">
+             <button ng-click="saveTournamentLocal(sct); sct='';" ng-disabled="astl||!sct||!newTournamentCan()" class="btn btn-primary">Save local</button>
+           </td></tr>
+           <tr ng-show="savedTournamentsLocal().length==0"><td>None</td></tr>
+           <tr>
+              <td><span ng-show="!newTournamentCan()" class="glyphicon glyphicon-ok"></span></td>
+              <td>New tournament</td>
+              <td>
+                 <button class="btn" ng-click="newTournamentLoad()" ng-show=" newTournamentCan()&&!astl">Load&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                 <button class="btn" ng-click="newTournamentLoad()" ng-show="!newTournamentCan()|| astl" disabled>Loaded</button>
+             </td>
+             <td></td><td></td><td></td>
+           </tr>
+           <tr ng-repeat="stl in savedTournamentsLocal()">
+             <td><span ng-show="isLocal&&lastLoaded==stl&&newTournamentCan()" class="glyphicon glyphicon-ok"></span></td>
+             <td>{{stl}}</td>
+             <td>
+               <button class="btn" ng-click="loadTournamentLocal(stl)" ng-show="!isSameAsTournament(stl)">Load&nbsp;&nbsp;&nbsp;&nbsp;</button>
+               <button class="btn" ng-click="loadTournamentLocal(stl)" ng-show=" isSameAsTournament(stl)" disabled>Loaded</button>
+             </td>
+             <td>
+               <button class="btn btn-primary" ng-click="saveTournamentLocal(stl)" ng-show="!isSameAsTournament(stl)">Save&nbsp;&nbsp;</button>
+               <button class="btn btn-primary" ng-click="saveTournamentLocal(stl)" ng-show=" isSameAsTournament(stl)" disabled>Saved</button>
+             </td>
+             <td>
+               <button class="btn btn-info" ng-click="autosaveSet(stl)" ng-show="!astl" ng-disabled="!isSameAsTournament(stl)">Autosave</button>
+               <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl==stl">Cancel autosave</button>
+             </td>
+             <td>
+               <button class="btn btn-danger glyphicon glyphicon-trash" ng-click="delTournamentLocal(stl)" ng-disabled="astl && astl==stl"></button>
+             </td>
+           </tr>
+         </table>
+      </div><!-- end Controller2 -->
+
+      <hr>
+
+      <div ng-controller="Controller3">
+
+         <table class="table">
+           <caption>Tournaments on server &nbsp; <button ng-click="list()" ng-disabled="anyAjaxWorking()" class="btn"><span class="glyphicon glyphicon-refresh"></span></button></caption>
+           <tr><td colspan=6>
+             <input type="text" ng-model="sctn" placeholder="Current tournament name" ng-disabled="astl">
+             <input type="password" ng-model="sctp" placeholder="Password" ng-disabled="astl">
+             <button ng-click="saveCore(sctn,sctp); sctn=''; sctp='';" ng-disabled="astl||!sctn||!sctp||!newTournamentCan()" class="btn btn-primary">Save to server</button>
+           </td></tr> 
+           <tr ng-show="savedTournaments.length==0"><td>None</td></tr>
+           <tr ng-repeat="stl in savedTournaments">
+             <td><span ng-show="!isLocal&&lastLoaded==stl&&newTournamentCan()" class="glyphicon glyphicon-ok"></span></td>
+             <td>{{stl}}</td>
+             <td>
+               <button class="btn" ng-click="get(stl)" ng-disabled="anyAjaxWorking()">Load</button>
+             </td>
+             <td>
+               <button class="btn btn-primary" ng-click="save(stl)" ng-disabled="anyAjaxWorking()">Save</button>
+             </td>
+             <td>
+               <button class="btn btn-info" ng-click="autosaveSet(stl)" ng-show="!astl">Autosave</button>
+               <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl.name==stl">Cancel autosave</button>
+             </td>
+             <td>
+               <a class="btn btn-success"  href="http://genesis.akikieng.com/yolo-bear-server/api/get.php?tournamentName={{stl}}&format=html" target="_blank">Share</a>
+             </td>
+             <td>
+               <button class="btn btn-danger glyphicon glyphicon-trash" ng-click="del(stl)" ng-disabled="(astl && astl.name==stl)||anyAjaxWorking()"></button>
+             </td>
+           </tr>
+         </table>
+      </div><!-- end Controller3 -->
+
+    </div><!-- end Saved div -->
+
+</div> <!-- end Controller1 -->
+
+<div hidden>  
+  <br><br><br>
+  <p style="font-size: 10px;">Your browser version: <span id="browsers"></span><br>
+  Currently <strong>Google Chrome 26.0.1403.0 or above</strong> is required (Dev or Canary channels)</strong><br><br>For more up to date compatibility information see <a href="http://peerjs.com/status">PeerJS WebRTC Status</a><br><br>Note that this demo may also fail if you are behind stringent firewalls or both you and the remote peer and behind symmetric NATs.</p>
+</div>
+
+</body> 
+</html> 
+
