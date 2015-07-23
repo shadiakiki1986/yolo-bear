@@ -222,4 +222,26 @@ console.log("metadata",$scope.regist.metaD);
 
   $scope.peersSorted=function() { return $scope.$parent.peers().sort(function(a,b) { return comparePeers(a,b,$scope.regist,$scope.$parent.nicks); }); };
 
+  $scope.loginForgot=function() {
+      $http.post(
+        YOLOBEAR_SERVER_URL+'/forgotPassword.php',
+        { email0:$scope.regist.email0 }
+      ).
+      success( function(rt) {
+        if(rt.error) {
+          console.log(rt.error);
+          return;
+        }
+        if(rt.warning) {
+          console.log(rt.warning);
+          return;
+        }
+        alert("An email has been sent to "+$scope.regist.email0+" with the password. Please check there (including the junk folder)");
+      }).
+      error( function(rt,et) {
+        alert("Error emailing forgotten password. "+et);
+      });
+  };
+
+
 }

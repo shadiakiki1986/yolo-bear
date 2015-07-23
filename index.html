@@ -67,9 +67,10 @@
             <input type="password" size=30 ng-model="regist.pwd" placeholder="Password">
             <br>
             <button ng-click="getEmail()" ng-disabled="regist.inProgress">Log in</button>
+            <button ng-click="loginForgot()" ng-disabled="!regist.email0">Forgot password</button>
             <button id="LoginNew" class="btn btn-lg btn-primary">New user</button>
             <button ng-click="loginForget()" ng-show="loginForgettable()">Forget</button>
-    
+   
             <div ng-show="regist.warning">Warning: {{regist.warning}}</div>
             <div ng-show="regist.error">Error: {{regist.error}}</div>
 
