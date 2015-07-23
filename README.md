@@ -3,7 +3,7 @@
 
 # Installation
 * Published on Google Play store <a href="https://play.google.com/store/apps/details?id=com.akikieng.genesis.yolobear">here</a>
-* Available on the web <a href="http://genesis.akikieng.com/yolo-bear/">here</a>
+* Available on the web <a href="http://shadiakiki1986.github.io/yolo-bear/">here</a>
 
 # Following an existing tournament 
 To connect to a tournament already being broadcasted
