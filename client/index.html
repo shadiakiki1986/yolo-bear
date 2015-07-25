@@ -12,6 +12,7 @@
         <script src="js/vendor/moment-2.9.0.min.js"></script>
         <script src="js/config.js"></script>
         <script src="js/common.js"></script>
+        <script src="js/AwsManager.js"></script>
         <script src="js/YoloBearPeer.js"></script>
         <script src="js/YoloBearPeerCore.js"></script>
         <script src="js/YoloBearPlayer.js"></script>
@@ -67,7 +68,7 @@
             <input type="password" size=30 ng-model="regist.pwd" placeholder="Password">
             <br>
             <button ng-click="getEmail()" ng-disabled="regist.inProgress">Log in</button>
-            <button ng-click="loginForgot()" ng-disabled="!regist.email0">Forgot password</button>
+            <button ng-click="loginForgot()" ng-show="regist.email0">Forgot password</button>
             <button id="LoginNew" class="btn btn-lg btn-primary">New user</button>
             <button ng-click="loginForget()" ng-show="loginForgettable()">Forget</button>
    
