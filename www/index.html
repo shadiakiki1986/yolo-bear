@@ -391,7 +391,7 @@
                <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl.name==stl">Stop autosave</button>
              </td>
              <td>
-               <a class="btn btn-success"  href="{{sharelink()}}" target="_blank">Share</a>
+               <a class="btn btn-success"  href="{{sharelink(stl)}}" target="_blank">Share</a>
              </td>
              <td>
                <button class="btn btn-danger glyphicon glyphicon-trash" ng-click="del(stl)" ng-disabled="(astl && astl.name==stl)||anyAjaxWorking()"></button>

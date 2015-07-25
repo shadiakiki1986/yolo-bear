@@ -64,13 +64,13 @@ function Controller3($scope,$http) {
     $scope.$parent.autosaveIsOn=false;
   };
 
-  $scope.sharelink = function() {
+  $scope.sharelink = function(stl) {
     var base = "";
     if(!USE_AWS_LAMBDA)
       base = "http://genesis.akikieng.com/yolo-bear-server/api/get.php";
     else
       base = "https://v029nrk9h7.execute-api.us-west-2.amazonaws.com/prod/yolo-bear-get";
-    return base+"?tournamentName="+$scope.stl+"&format=html";
+    return base+"?tournamentName="+stl+"&format=html";
   };
 
   angular.element(document).ready(function() {
