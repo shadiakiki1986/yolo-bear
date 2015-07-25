@@ -1,6 +1,7 @@
 var NewManager = function($scope,$http) {
 
-  this.nonLambda=function(name,pass) {
+  this.nonLambda=function(name,pass,cbFn) {
+    var self = this;
     $http(
       { method:'GET',
         url: YOLOBEAR_SERVER_URL+'/new.php',
@@ -10,12 +11,12 @@ var NewManager = function($scope,$http) {
           tournamentData:angular.fromJson(angular.toJson($scope.$parent.ybt)) // to drop angular fields
         }
       }).
-      success( this.success ).
+      success( function(rt) { self.success(rt,cbFn); self.complete(); } ).
       error( this.error )
     ;
   };
 
-  this.lambda = function(name,pass) {
+  this.lambda = function(name,pass,cbFn) {
     var self=this;
     $scope.$parent.awsMan.invokeLambda(
       "yolo-bear-new",
@@ -34,20 +35,29 @@ var NewManager = function($scope,$http) {
           rt = { error: rt.errorMessage };
         }
 
-        self.success(rt);
+        $scope.$apply(function() {
+          self.success(rt,cbFn);
+          self.complete();
+        });
     });
   };
 
-  this.success = function(rt) {
+  this.success = function(rt,cbFn) {
         if(rt.error) {
           alert("Error: "+rt.error);
           return;
         }
         $scope.list();
+        if(typeof cbFn!=='undefined') cbFn();
   };
 
   this.error = function(rt,et) {
         alert("Error adding/updating tournament on server. "+et);
+        this.complete();
+  };
+
+  this.complete = function() {
+        $scope.asp=false;
   };
 
 } // end class

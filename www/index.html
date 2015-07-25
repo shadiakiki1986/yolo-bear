@@ -384,11 +384,11 @@
                <button class="btn" ng-click="get(stl)" ng-disabled="anyAjaxWorking()">Load</button>
              </td>
              <td>
-               <button class="btn btn-primary" ng-click="save(stl)" ng-disabled="anyAjaxWorking()">Save</button>
+               <button class="btn btn-primary" ng-click="save(stl)" ng-disabled="anyAjaxWorking() || asp">Save</button>
              </td>
              <td>
-               <button class="btn btn-info" ng-click="autosaveSet(stl)" ng-show="!astl">Autosave</button>
-               <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl.name==stl">Cancel autosave</button>
+               <button class="btn btn-info" ng-click="autosaveSet(stl)" ng-show="!astl" ng-disabled="anyAjaxWorking() || asp">Autosave</button>
+               <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl.name==stl">Stop autosave</button>
              </td>
              <td>
                <a class="btn btn-success"  href="http://genesis.akikieng.com/yolo-bear-server/api/get.php?tournamentName={{stl}}&format=html" target="_blank">Share</a>

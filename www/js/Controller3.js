@@ -16,9 +16,11 @@ function Controller3($scope,$http) {
   };
 
   nm = new NewManager($scope,$http);
-  $scope.saveCore=function(name,pass) {
+  $scope.asp = false;
+  $scope.saveCore=function(name,pass,cbFn) {
     if(pass===null) return;
-    if(!USE_AWS_LAMBDA) nm.nonLambda(name,pass); else nm.lambda(name,pass);
+    $scope.asp = true;
+    if(!USE_AWS_LAMBDA) nm.nonLambda(name,pass,cbFn); else nm.lambda(name,pass,cbFn);
   };
 
   passRequest=function() {
@@ -46,14 +48,20 @@ function Controller3($scope,$http) {
   $scope.autosaveSet=function(name) {
     pass=passRequest();
     if(pass===null) return;
-    $scope.astl={name:name,pass:pass};
-    $scope.sctn=name;
-    $scope.sctp=pass;
+    // dummy save to test password
+    $scope.saveCore(name,pass,function() {
+      // this will run upon a successful dummy save
+      $scope.astl={name:name,pass:pass};
+      $scope.sctn=name;
+      $scope.sctp=pass;
+      $scope.$parent.autosaveIsOn=true;
+    });
   };
   $scope.autosaveRemove=function() {
     $scope.astl=null;
     $scope.sctn="";
     $scope.sctp="";
+    $scope.$parent.autosaveIsOn=false;
   };
 
   angular.element(document).ready(function() {
