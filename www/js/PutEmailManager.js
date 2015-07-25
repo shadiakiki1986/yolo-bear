@@ -14,6 +14,29 @@ var PutEmailManager = function($scope,$http) {
       error( this.error );
   };
 
+  this.lambda = function(useEmptyPeerId) {
+    var self=this;
+    $scope.$parent.$parent.awsMan.invokeLambda(
+      "yolo-bear-putEmail",
+      { email0:$scope.regist.email0,
+        pwd:$scope.regist.pwd,
+        nick:$scope.$parent.nickName.val,
+        peerId:(useEmptyPeerId?"":$scope.id),
+        metaD:angular.toJson($scope.regist.metaD)
+      }, // event
+      function(err,data) {
+        if (err||data.StatusCode!=200) {
+          self.error(null,err);
+          return;
+        }
+        rt=angular.fromJson(data.Payload);
+        if(rt.hasOwnProperty("errorMessage")) {
+          rt = { error: rt.errorMessage };
+        }
+        $scope.$apply(function() { self.success(rt); });
+    }); 
+  };
+
   this.success = function(rt) {
         if(rt.error) {
           $scope.regist.error=rt.error;

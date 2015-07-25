@@ -14,6 +14,27 @@ var PutNickManager = function($scope,$http) {
     ;
   };
 
+  this.lambda = function() {
+    var self=this;
+    $scope.$parent.$parent.awsMan.invokeLambda(
+      "yolo-bear-putNick",
+      { peerId:$scope.id,
+        nick:$scope.$parent.nickName.val,
+        pwd:$scope.$parent.nickName.pwd
+      }, // event
+      function(err,data) {
+        if (err||data.StatusCode!=200) {
+          self.error(null,err);
+          return;
+        }
+        rt=angular.fromJson(data.Payload);
+        if(rt.hasOwnProperty("errorMessage")) {
+          rt = { error: rt.errorMessage };
+        }
+        $scope.$apply(function() { self.success(rt); });
+    }); 
+  };
+
   this.success = function(rt) {
         if(rt.error) {
           $scope.nickName2.error=rt.error;

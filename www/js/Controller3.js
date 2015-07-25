@@ -12,28 +12,21 @@ function Controller3($scope,$http) {
   $scope.lastLoaded=null;
   gm = new GetManager($scope,$http);
   $scope.get=function(name) {
-    if(!USE_AWS_LAMBDA) gm.nonLambda(); else gm.lambda();
+    if(!USE_AWS_LAMBDA) gm.nonLambda(name); else gm.lambda(name);
   };
 
+  nm = new NewManager($scope,$http);
   $scope.saveCore=function(name,pass) {
-    $http({ method:'GET',
-      url: YOLOBEAR_SERVER_URL+'/new.php',
-      params: {tournamentName:name,tournamentPassword:pass,tournamentData:$scope.$parent.ybt}
-      }).
-      success( function(rt) {
-        if(rt.error) {
-          alert("Error: "+rt.error);
-          return;
-        }
-        $scope.list();
-      }).
-      error( function(rt,et) {
-        alert("Error adding/updating tournament "+name+" on server. "+et);
-      })
-    ;
+    if(pass===null) return;
+    if(!USE_AWS_LAMBDA) nm.nonLambda(name,pass); else nm.lambda(name,pass);
   };
 
-  passRequest=function() { return prompt("Enter tournament password",""); };
+  passRequest=function() {
+    pass = prompt("Enter tournament password","");
+    if(pass=="") pass=null;
+   // console.log("PASSREQ",pass);
+    return pass;
+  };
 
   $scope.save=function(name) {
     $scope.saveCore(name,passRequest());
@@ -42,6 +35,7 @@ function Controller3($scope,$http) {
   dm = new DelManager($scope,$http);
   $scope.del=function(name) {
     pass=passRequest();
+    if(pass===null) return;
     if(!USE_AWS_LAMBDA) dm.nonLambda(name,pass); else dm.lambda(name,pass);
   };
 
@@ -51,6 +45,7 @@ function Controller3($scope,$http) {
 
   $scope.autosaveSet=function(name) {
     pass=passRequest();
+    if(pass===null) return;
     $scope.astl={name:name,pass:pass};
     $scope.sctn=name;
     $scope.sctp=pass;

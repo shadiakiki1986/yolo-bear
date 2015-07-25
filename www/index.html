@@ -10,6 +10,7 @@
         <script src="js/vendor/angular-1.2.28.min.js"></script>
         <script src="js/vendor/peer-0.3.0.min.js"></script>
         <script src="js/vendor/moment-2.9.0.min.js"></script>
+        <script src="js/vendor/aws-sdk-2.1.36.min.js"></script>
         <script src="js/config.js"></script>
         <script src="js/common.js"></script>
         <script src="js/AwsManager.js"></script>
@@ -30,6 +31,7 @@
         <script src="js/GetManager.js"></script>
         <script src="js/ListManager.js"></script>
         <script src="js/DelManager.js"></script>
+        <script src="js/NewManager.js"></script>
         <script src="js/Controller3.js"></script>
         <script src="js/fb.js"></script>
         <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap-3.3.2.min.css">
@@ -354,7 +356,7 @@
              </td>
              <td>
                <button class="btn btn-info" ng-click="autosaveSet(stl)" ng-show="!astl" ng-disabled="!isSameAsTournament(stl)">Autosave</button>
-               <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl==stl">Cancel autosave</button>
+               <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl==stl">Stop autosave</button>
              </td>
              <td>
                <button class="btn btn-danger glyphicon glyphicon-trash" ng-click="delTournamentLocal(stl)" ng-disabled="astl && astl==stl"></button>

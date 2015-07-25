@@ -66,7 +66,6 @@ AwsManager.prototype.invokeLambda = function(lfn,lp,cbFn) {
       Payload: JSON.stringify(lp)
     };
     lambda.invoke(params, cbFn);
-
   });
 
 }; // end invokeLambda
