@@ -4,8 +4,8 @@
 
 set -e
 
-version=0.0.2
-versionCode=3
+version=0.0.3 # bump version here
+versionCode=4 # also bump here
 output=~/Yolobear_${version}_arm.apk
 
 rm -f $output

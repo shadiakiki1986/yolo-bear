@@ -1,6 +1,10 @@
 I'm tring to follow Semantic Versioning 2.0.0
 http://semver.org/
 
+=V0.0.3=
+2015-07-25
+* Use aws lambda, github pages
+
 =V0.0.2=
 2015-04-06
 * share server tournament opens in new tab
