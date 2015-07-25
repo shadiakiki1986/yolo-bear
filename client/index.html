@@ -10,6 +10,7 @@
         <script src="js/vendor/angular-1.2.28.min.js"></script>
         <script src="js/vendor/peer-0.3.0.min.js"></script>
         <script src="js/vendor/moment-2.9.0.min.js"></script>
+        <script src="js/vendor/aws-sdk-2.1.36.min.js"></script>
         <script src="js/config.js"></script>
         <script src="js/common.js"></script>
         <script src="js/AwsManager.js"></script>
@@ -19,9 +20,18 @@
         <script src="js/YoloBearTeam.js"></script>
         <script src="js/YoloBearGame.js"></script>
         <script src="js/YoloBearTournament.js"></script>
+        <script src="js/ListNickManager.js"></script>
+        <script src="js/PutNickManager.js"></script>
+        <script src="js/PutEmailManager.js"></script>
+        <script src="js/GetEmailManager.js"></script>
+        <script src="js/ForgotPasswordManager.js"></script>
         <script src="js/YoloBearDynamo.js"></script>
         <script src="js/Controller1.js"></script>
         <script src="js/Controller2.js"></script>
+        <script src="js/GetManager.js"></script>
+        <script src="js/ListManager.js"></script>
+        <script src="js/DelManager.js"></script>
+        <script src="js/NewManager.js"></script>
         <script src="js/Controller3.js"></script>
         <script src="js/fb.js"></script>
         <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap-3.3.2.min.css">
@@ -346,7 +356,7 @@
              </td>
              <td>
                <button class="btn btn-info" ng-click="autosaveSet(stl)" ng-show="!astl" ng-disabled="!isSameAsTournament(stl)">Autosave</button>
-               <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl==stl">Cancel autosave</button>
+               <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl==stl">Stop autosave</button>
              </td>
              <td>
                <button class="btn btn-danger glyphicon glyphicon-trash" ng-click="delTournamentLocal(stl)" ng-disabled="astl && astl==stl"></button>
@@ -374,14 +384,14 @@
                <button class="btn" ng-click="get(stl)" ng-disabled="anyAjaxWorking()">Load</button>
              </td>
              <td>
-               <button class="btn btn-primary" ng-click="save(stl)" ng-disabled="anyAjaxWorking()">Save</button>
+               <button class="btn btn-primary" ng-click="save(stl)" ng-disabled="anyAjaxWorking() || asp">Save</button>
              </td>
              <td>
-               <button class="btn btn-info" ng-click="autosaveSet(stl)" ng-show="!astl">Autosave</button>
-               <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl.name==stl">Cancel autosave</button>
+               <button class="btn btn-info" ng-click="autosaveSet(stl)" ng-show="!astl" ng-disabled="anyAjaxWorking() || asp">Autosave</button>
+               <button class="btn btn-warning" ng-click="autosaveRemove()" ng-show="astl && astl.name==stl">Stop autosave</button>
              </td>
              <td>
-               <a class="btn btn-success"  href="http://genesis.akikieng.com/yolo-bear-server/api/get.php?tournamentName={{stl}}&format=html" target="_blank">Share</a>
+               <a class="btn btn-success"  href="{{sharelink()}}" target="_blank">Share</a>
              </td>
              <td>
                <button class="btn btn-danger glyphicon glyphicon-trash" ng-click="del(stl)" ng-disabled="(astl && astl.name==stl)||anyAjaxWorking()"></button>

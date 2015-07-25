@@ -1,4 +1,7 @@
 function Controller1($scope) {
+
+$scope.awsMan = null;
+
 $scope.ybt=new YoloBearTournament();
 $scope.addPlayer=function() {
     $scope.ybt.addPlayer($scope.newPlayer.name,$scope.newPlayer.team);
@@ -101,4 +104,21 @@ $scope.setGamePlayerScore=function(ga,gpsid,sn,sv) {
   };
 
   $scope.isLocal=false;
+
+  angular.element(document).ready(function() {
+    // cognito role
+    // Initialize the Amazon Cognito credentials provider
+    AWS.config.region = 'us-east-1'; // Region
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: 'us-east-1:639fd2a8-8277-4726-b9b3-3231ed0d5f71',
+    });
+    // note that this is only the timeout for making a connection.
+    // The timeout for the tokens is by default 15 minutes, as documented here under TokenDuration
+    // http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/CognitoIdentity.html
+    // That is why I run a setTimeout in AwsManager to change the connection status to disconnected 15 minutes after the initial connection
+    AWS.config.httpOptions = { timeout: 5000 };
+
+    $scope.awsMan = new AwsManager();
+  });
+
 }
