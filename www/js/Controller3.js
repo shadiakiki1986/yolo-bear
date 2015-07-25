@@ -4,43 +4,17 @@ function Controller3($scope,$http) {
 
   $scope.savedTournaments=[];
 
+  lm = new ListManager($scope,$http);
   $scope.list=function() {
-    $http.get(YOLOBEAR_SERVER_URL+'/list.php').
-      success( function(rt) {
-        if(rt.error) {
-          alert("Error: "+rt.error);
-          return;
-        }
-        $scope.savedTournaments=angular.fromJson(rt).sort();
-        $scope.$parent.savedTournamentsServerN=$scope.savedTournaments.length;
-      }).
-      error( function(rt,et) {
-        alert("Error listing tournaments on server. "+et);
-      })
-    ;
+    if(!USE_AWS_LAMBDA) lm.nonLambda(); else lm.lambda();
   };
  
   $scope.lastLoaded=null;
+  gm = new GetManager($scope,$http);
   $scope.get=function(name) {
-    $http({ method:'GET',
-      url: YOLOBEAR_SERVER_URL+'/get.php',
-      params: {tournamentName:name}
-      }).
-      success( function(rt) {
-        if(rt.error) {
-          alert("Error: "+rt.error);
-          return;
-        }
-        $scope.$emit('responseDataBroadcast',angular.fromJson(rt).tournamentData);
-        $scope.lastLoaded=name;
-        $scope.$parent.isLocal=false;
-      }).
-      error( function(rt,et) {
-        alert("Error getting tournament "+name+" from server. "+et);
-      })
-    ;
+    if(!USE_AWS_LAMBDA) gm.nonLambda(); else gm.lambda();
   };
- 
+
   $scope.saveCore=function(name,pass) {
     $http({ method:'GET',
       url: YOLOBEAR_SERVER_URL+'/new.php',
@@ -65,22 +39,10 @@ function Controller3($scope,$http) {
     $scope.saveCore(name,passRequest());
   };
 
+  dm = new DelManager($scope,$http);
   $scope.del=function(name) {
     pass=passRequest();
-    $http({ method:'GET',
-      url: YOLOBEAR_SERVER_URL+'/del.php',
-      params: {tournamentName:name,tournamentPassword:pass}
-      }).
-      success(function(rt) {
-        if(rt.error) {
-          alert("Error: "+rt.error);
-          return;
-        }
-        $scope.list();
-      }).
-      error(function(rt,et) {
-        alert("Error deleting tournament "+name+" from server. "+rt+"."+et);
-      })
+    if(!USE_AWS_LAMBDA) dm.nonLambda(name,pass); else dm.lambda(name,pass);
   };
 
   $scope.astl=null;
